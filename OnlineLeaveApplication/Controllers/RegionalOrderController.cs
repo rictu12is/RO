@@ -161,35 +161,135 @@ namespace OnlineLeaveApplication.Controllers
                 return new HttpStatusCodeResult(401);
             }
 
-            var regionalOrderDates = db.RegionalOrderDetailDates
-                .Where(a => a.ActivityDate.HasValue &&
-                            a.RegionalOrderDetail.EmployeeID == employeeID.Value)
-                .Select(a => new
-                {
-                    a.ActivityDate,
-                    a.RegionalOrderDetail.RegionalOrder.RegionalOrderID,
-                    a.RegionalOrderDetail.RegionalOrder.RegionalOrderNumber,
-                    a.RegionalOrderDetail.RegionalOrder.Title
-                })
+            var regionalOrders = db.RegionalOrders
+                .Where(a => a.RegionalOrderDetails.Any(d => d.EmployeeID == employeeID.Value))
                 .ToList();
 
-            var events = regionalOrderDates
-                .Select(item =>
-                {
-                    var title = string.Join(" - ", new[] { item.RegionalOrderNumber, item.Title }
-                        .Where(value => !string.IsNullOrWhiteSpace(value))).Trim();
+            var events = new List<object>();
+            var today = DateTime.Today;
 
-                    return new
+            foreach (var regionalOrder in regionalOrders)
+            {
+                var activityDates = regionalOrder.RegionalOrderDetails
+                    .SelectMany(detail => detail.RegionalOrderDetailDates)
+                    .Where(date => date.ActivityDate.HasValue)
+                    .Select(date => date.ActivityDate.Value.Date)
+                    .Distinct()
+                    .OrderBy(date => date)
+                    .ToList();
+
+                if (!activityDates.Any())
+                {
+                    continue;
+                }
+
+                var eventTitle = string.Join(" - ", new[] { regionalOrder.RegionalOrderNumber, regionalOrder.Title }
+                    .Where(value => !string.IsNullOrWhiteSpace(value))).Trim();
+
+                if (string.IsNullOrWhiteSpace(eventTitle))
+                {
+                    eventTitle = "Regional Order";
+                }
+
+                var details = regionalOrder.RegionalOrderDetails.ToList();
+                var participants = details
+                    .Where(detail => detail.Employee != null)
+                    .Select(detail => detail.Employee.LastName + ", " + detail.Employee.FirstName + " " + detail.Employee.MiddleName)
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .Distinct()
+                    .ToList();
+
+                var venues = details
+                    .Where(detail => !string.IsNullOrWhiteSpace(detail.Venue))
+                    .Select(detail => detail.Venue)
+                    .Distinct()
+                    .ToList();
+
+                var remarks = details
+                    .Where(detail => !string.IsNullOrWhiteSpace(detail.Remarks))
+                    .Select(detail => detail.Remarks)
+                    .Distinct()
+                    .ToList();
+
+                var eventDetails = new
+                {
+                    regionalOrderID = regionalOrder.RegionalOrderID,
+                    regionalOrderNumber = regionalOrder.RegionalOrderNumber ?? string.Empty,
+                    title = regionalOrder.Title ?? string.Empty,
+                    regionalOrderDate = regionalOrder.RegionalOrderDate.HasValue
+                        ? regionalOrder.RegionalOrderDate.Value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                        : string.Empty,
+                    venue = string.Join(", ", venues),
+                    activityDates = activityDates
+                        .Select(date => date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture))
+                        .ToList(),
+                    participants = participants,
+                    remarks = string.Join(", ", remarks),
+                    pdfUrl = Url.Action("DisplayFile", "RegionalOrder", new { id = regionalOrder.RegionalOrderID })
+                };
+
+                var rangeStart = activityDates.First();
+                var previousDate = rangeStart;
+
+                for (var index = 1; index <= activityDates.Count; index++)
+                {
+                    var startsNewRange = index == activityDates.Count ||
+                        activityDates[index] != previousDate.AddDays(1);
+
+                    if (startsNewRange)
                     {
-                        title = string.IsNullOrWhiteSpace(title) ? "Regional Order" : title,
-                        start = item.ActivityDate.Value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-                        allDay = true,
-                        url = Url.Action("DisplayFile", "RegionalOrder", new { id = item.RegionalOrderID }),
-                        backgroundColor = "#007bff",
-                        borderColor = "#007bff"
-                    };
-                })
-                .ToList();
+                        var statusCategory = previousDate < today
+                            ? "past"
+                            : rangeStart > today
+                                ? "upcoming"
+                                : "today";
+                        var statusColor = statusCategory == "past"
+                            ? "#28a745"
+                            : statusCategory == "today"
+                                ? "#ffc107"
+                                : "#007bff";
+
+                        events.Add(new
+                        {
+                            title = eventTitle,
+                            start = rangeStart.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                            end = previousDate.AddDays(1).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                            allDay = true,
+                            backgroundColor = statusColor,
+                            borderColor = statusColor,
+                            textColor = statusCategory == "today" ? "#1f2d3d" : "#ffffff",
+                            extendedProps = new
+                            {
+                                eventDetails.regionalOrderID,
+                                eventDetails.regionalOrderNumber,
+                                eventDetails.title,
+                                eventDetails.regionalOrderDate,
+                                eventDetails.venue,
+                                eventDetails.activityDates,
+                                eventDetails.participants,
+                                eventDetails.remarks,
+                                eventDetails.pdfUrl,
+                                statusCategory = statusCategory,
+                                statusColor = statusColor,
+                                rangeLabel = rangeStart == previousDate
+                                    ? rangeStart.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                                    : rangeStart.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) + " - " +
+                                      previousDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                            }
+                        });
+
+                        if (index < activityDates.Count)
+                        {
+                            rangeStart = activityDates[index];
+                        }
+                    }
+
+                    if (index < activityDates.Count)
+                    {
+                        previousDate = activityDates[index];
+                    }
+                }
+            }
 
             return Json(events, JsonRequestBehavior.AllowGet);
         }

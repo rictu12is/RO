@@ -3,18 +3,209 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="card card-primary">
-    <div class="card-header">
-        <h3 class="card-title">My Regional Orders Calendar</h3>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">My Regional Orders Calendar</h3>
+            </div>
+            <div class="card-body p-0">
+                <div id="regional-order-calendar" class="p-3"></div>
+            </div>
+        </div>
     </div>
-    <div class="card-body p-0">
-        <div id="regional-order-calendar" class="p-3"></div>
+    <div class="col-lg-4">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Upcoming Regional Orders</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="upcoming-regional-orders"></div>
+            </div>
+        </div>
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Today's Regional Orders</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="today-regional-orders"></div>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Past Regional Orders</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="past-regional-orders"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_regional_order_details" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Regional Order Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Regional Order No.</dt>
+                    <dd class="col-sm-9" id="ro-detail-number"></dd>
+
+                    <dt class="col-sm-3">Title</dt>
+                    <dd class="col-sm-9" id="ro-detail-title"></dd>
+
+                    <dt class="col-sm-3">Date Issued</dt>
+                    <dd class="col-sm-9" id="ro-detail-date-issued"></dd>
+
+                    <dt class="col-sm-3">Venue</dt>
+                    <dd class="col-sm-9" id="ro-detail-venue"></dd>
+
+                    <dt class="col-sm-3">Activity Dates</dt>
+                    <dd class="col-sm-9">
+                        <ul class="mb-0 pl-3" id="ro-detail-activity-dates"></ul>
+                    </dd>
+
+                    <dt class="col-sm-3">Participants</dt>
+                    <dd class="col-sm-9">
+                        <ul class="mb-0 pl-3" id="ro-detail-participants"></ul>
+                    </dd>
+
+                    <dt class="col-sm-3">Remarks</dt>
+                    <dd class="col-sm-9" id="ro-detail-remarks"></dd>
+
+                    <dt class="col-sm-3">Attached PDF</dt>
+                    <dd class="col-sm-9">
+                        <a id="ro-detail-pdf" href="#" target="_blank" title="Open attached PDF">
+                            <i class="fas fa-file-pdf fa-lg text-danger"></i>
+                        </a>
+                    </dd>
+                </dl>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     $(function () {
         var calendarEl = document.getElementById('regional-order-calendar');
+        var calendarEvents = [];
+
+        function setText(selector, value, emptyText) {
+            $(selector).text(value || emptyText || '');
+        }
+
+        function setList(selector, values, emptyText) {
+            var list = $(selector);
+            list.empty();
+
+            if (!values || values.length === 0) {
+                list.append($('<li />').text(emptyText || 'None'));
+                return;
+            }
+
+            values.forEach(function (value) {
+                list.append($('<li />').text(value));
+            });
+        }
+
+        function showRegionalOrderDetails(details) {
+            setText('#ro-detail-number', details.regionalOrderNumber, 'N/A');
+            setText('#ro-detail-title', details.title, 'N/A');
+            setText('#ro-detail-date-issued', details.regionalOrderDate, 'N/A');
+            setText('#ro-detail-venue', details.venue, 'N/A');
+            setText('#ro-detail-remarks', details.remarks, 'N/A');
+            setList('#ro-detail-activity-dates', details.activityDates, 'No activity dates');
+            setList('#ro-detail-participants', details.participants, 'No participants');
+            $('#ro-detail-pdf').attr('href', details.pdfUrl || '#');
+            $('#modal_regional_order_details').modal('show');
+        }
+
+        function getEventDetails(eventItem) {
+            return eventItem.extendedProps || eventItem;
+        }
+
+        function renderRegionalOrderList(selector, events, emptyText) {
+            var container = $(selector);
+            container.empty();
+
+            if (!events.length) {
+                container.append(
+                    $('<div />')
+                        .addClass('list-group-item text-muted')
+                        .text(emptyText)
+                );
+                return;
+            }
+
+            events.forEach(function (eventItem) {
+                var details = getEventDetails(eventItem);
+                var item = $('<button />')
+                    .attr('type', 'button')
+                    .addClass('list-group-item list-group-item-action')
+                    .on('click', function () {
+                        showRegionalOrderDetails(details);
+                    });
+
+                item.append($('<div />')
+                    .addClass('font-weight-bold')
+                    .text(details.regionalOrderNumber || 'Regional Order'));
+                item.append($('<div />')
+                    .addClass('small')
+                    .text(details.title || 'No title'));
+                item.append($('<div />')
+                    .addClass('small text-muted')
+                    .text(details.rangeLabel || 'No activity date'));
+
+                container.append(item);
+            });
+        }
+
+        function renderStatusCards(events) {
+            renderRegionalOrderList(
+                '#upcoming-regional-orders',
+                events.filter(function (eventItem) {
+                    return getEventDetails(eventItem).statusCategory === 'upcoming';
+                }),
+                'No upcoming regional orders'
+            );
+            renderRegionalOrderList(
+                '#today-regional-orders',
+                events.filter(function (eventItem) {
+                    return getEventDetails(eventItem).statusCategory === 'today';
+                }),
+                'No regional orders today'
+            );
+            renderRegionalOrderList(
+                '#past-regional-orders',
+                events.filter(function (eventItem) {
+                    return getEventDetails(eventItem).statusCategory === 'past';
+                }),
+                'No past regional orders'
+            );
+        }
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: ['bootstrap', 'dayGrid', 'timeGrid'],
@@ -26,15 +217,30 @@
             },
             defaultView: 'dayGridMonth',
             eventLimit: true,
-            events: '/RegionalOrder/GetMyRegionalOrderCalendarEvents',
+            events: function (fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '/RegionalOrder/GetMyRegionalOrderCalendarEvents',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (events) {
+                        calendarEvents = events || [];
+                        renderStatusCards(calendarEvents);
+                        successCallback(calendarEvents);
+                    },
+                    error: function () {
+                        renderStatusCards([]);
+                        failureCallback();
+                    }
+                });
+            },
             eventClick: function (info) {
-                if (info.event.url) {
-                    info.jsEvent.preventDefault();
-                    window.open(info.event.url, '_blank');
-                }
+                info.jsEvent.preventDefault();
+                var details = info.event.extendedProps;
+                showRegionalOrderDetails(details.extendedProps || details);
             }
         });
 
+        renderStatusCards(calendarEvents);
         calendar.render();
     });
 </script>
