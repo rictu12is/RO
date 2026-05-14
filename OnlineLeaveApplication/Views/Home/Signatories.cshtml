@@ -1,0 +1,122 @@
+﻿
+@{
+    ViewBag.Title = "Signatories";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table id="table_signatory" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>OfficeID</th>
+            <th>Office</th>
+            <th>For Certification</th>
+            <th>For Review</th>
+            <th>For Approval</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<!-- Modals -->
+<div class="modal fade" id="modal_signatory" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Office Information</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_signatory">
+                    <input type="hidden" name="MainOfficeID" />
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label>
+                                Office Name
+                            </label>
+                            <input type="text" name="MainOfficeName" class="form-control" />
+                        </div>
+                        @Html.Label("For Certification")
+                        @Html.DropDownList("ForCertification", ViewBag.Signatories as List<SelectListItem>, "-- Choose Employee --", new { @class = "form-control select2 select2-danger", @style = "width: 100%", @name = "ForInitialReview", data_dropdown_css_class = "select2-danger" })
+                        @Html.Label("For Review")
+                        @Html.DropDownList("ForReview", ViewBag.Signatories as List<SelectListItem>, "-- Choose Employee --", new { @class = "form-control select2 select2-danger", @style = "width: 100%", @name = "ForReview", data_dropdown_css_class = "select2-danger" })
+                        @Html.Label("For Approval")
+                        @Html.DropDownList("ForApproval", ViewBag.Signatories as List<SelectListItem>, "-- Choose Employee --", new { @class = "form-control select2 select2-danger", @style = "width: 100%", @name = "ForApproval", data_dropdown_css_class = "select2-danger" })
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnSave">Save Changes</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<script>
+    $(function () {
+
+
+        var table_signatory = $('#table_signatory').DataTable({
+            processing: true,      // Show loading indicator
+            serverSide: true,      // Enable server-side processing
+            autoWidth: false,      // Disable automatic column width calculation
+            lengthChange: false,
+            searching: true,
+            info: true,
+            pageLength: 5,
+            ajax: {
+                "url": "/LeaveApplication/GetSignatories", // URL for server-side processing
+                "type": "POST"
+            },
+            columns: [
+
+                { "data": "MainOfficeID", title: 'MainOfficeID', visible: false },
+                { "data": "MainOfficeName", title: 'Office' },
+                { "data": "ForCertification", title: 'For Certification' },
+                { "data": "ForReview", title: 'For Review' },
+                { "data": "ForApproval", title: 'For Approval' },
+                {
+                    title: 'Action', className: "text-center",
+                    render: function (data, type, row, meta) {
+                        return `<button class='btn btn-sm btn-primary' title='View Signatories' data-toggle='modal' data-target='#modal_signatory' onclick='getData(` + JSON.stringify(row) + `);'><i class='fas fa-info-circle'></i></button>`
+                    }
+                },
+            ],
+            buttons: [
+                {
+                    text: "<i class='fas fa-user-tie'></i> Add New",
+                    className: "btn btn-dark",
+                    attr: {
+                        "data-toggle": "modal",
+                        "data-target": "#modal_signatory",
+                    },
+                    action: function (e, dt, node, config) { 
+                        $('#form_signatory').trigger('reset');
+                    }
+                }, 
+            ]
+        });
+
+        $("#btnSave").click(function () {
+            var signatory = _defineObject({}, "form_signatory");
+            $.post("/LeaveApplication/SaveMainOffice", {
+                mainOffice: signatory
+            }, function (response) { 
+                table_signatory.ajax.reload();
+                $("#modal_signatory").modal('hide');
+            }, "json");
+        });
+
+    });
+    function getData(d) { 
+        $('input[name="MainOfficeID"]').val(d.MainOfficeID);
+        $('input[name="MainOfficeName"]').val(d.MainOfficeName).trigger('change');
+        $('#ForReview').val(d.ForReviewID).trigger('change');
+        $('#ForCertification').val(d.ForCertificationID).trigger('change');
+        $('#ForApproval').val(d.ForApprovalID).trigger('change');
+    }
+</script>

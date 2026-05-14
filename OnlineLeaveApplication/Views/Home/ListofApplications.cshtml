@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewBag.Title = "ListofApplications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input type="hidden" id="LeaveApplicationID" />
+<table id="table_leave" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Date Applied</th>
+            <th>Leave Detail</th>
+            <th>Total Number of Days</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(function () {
+        var table_leave = $('#table_leave').DataTable({
+            processing: true,      // Show loading indicator
+            serverSide: true,      // Enable server-side processing
+            autoWidth: false,      // Disable automatic column width calculation
+            lengthChange: false,
+            searching: true,
+            info: true,
+            pageLength: 5,
+            ajax: {
+                "url": "/LeaveApplication/GetLeaveApplications", // URL for server-side processing
+                "data": { forApproval: true },
+                "type": "POST"
+            },
+            columns: [
+                { "data": "DateApplied", title: 'Date Applied' },
+                {
+                    title: 'Leave Detail',
+                    render: function (data, type, row, meta) {
+                        return "<b>" + row.DILGPersonnel + "</b><br>" + row.LeaveDetail
+                    }
+                },
+                { "data": "TotalNumberofDays", title: 'Total Number of Days', className: 'text-center' },
+                {
+                    "data": "Status", title: 'Status', className: "text-center",
+                    render: function (data, type, row, meta) {
+                        return `<button class='btn btn-sm btn-primary' onclick='getData(` + JSON.stringify(row) + `);' title='View Details' data-toggle='modal' data-target='#modal_details'><i class='fas fa-info-circle'></i></button>`
+                    }
+                },
+            ],
+        });
+
+        $("#btnSubmit").click(function () {
+            $.post("/LeaveApplication/SubmitLeaveApplication", { leaveApplicationID: $("#LeaveApplicationID").val(), remarks: $('textarea[name="Remarks"]').val() }, function (response) {
+                table_leave.ajax.reload();
+                $("#modal_details").modal('hide');
+            }, "json");
+        });
+    });
+
+    function getData(d) {
+        var row = d;
+        $("#LeaveApplicationID").val(row.LeaveApplicationID);
+        var arr = row.Attachments.split(",");
+        var attachments = '';
+        arr.forEach((d, i) => {
+            var data = d.split("|");
+            if (d !== "") {
+                attachments += '<a href="' + "/LeaveApplication/DisplayFile?id=" + data[0] + '" target="_blank"><i class="fas fa-file-pdf"></i> <strong>' + data[1] + '</strong></a><br>';
+            } else {
+                attachments = '<i>No attachments</i>';
+            }
+        });
+
+        $("#LeaveDetail").html(`<div class="card-body">
+                <dl>
+                  <dt>DILG Personnel</dt>
+                  <dd>` + row.DILGPersonnel + `</dd>
+                  <dt>Days of leave</dt>
+                  <dd>` + row.TotalNumberofDays + `</dd> 
+                  <dt>Leave details</dt>
+                  <dd>` + row.LeaveDates + `</dd>
+                  <dt>Attachments</dt>
+                  <dd>` + attachments + `</dd>
+                </dl>
+              </div>`);
+          
+        if (d.Status == 'For Review') {
+            $("#btnSubmit").html('Submit for Review'); 
+        } else {
+            $("#btnSubmit").html('Approve');
+        }
+        //$.post("/LeaveApplication/SaveLeaveApplication", { list: table_leavedetail.column(3).data().toArray() }, function (response) {
+        //    alert(response);
+        //    table_leave.ajax.reload();
+        //    $("#modal-lg").modal('hide');
+        //}, "json");
+    }
+</script>
+<!-- Modals -->
+<div class="modal fade" id="modal_details" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Leave Information</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_details">
+                    <div id="LeaveDetail"></div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <textarea rows="3" class="form-control" name="Remarks"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnSubmit">Approve</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

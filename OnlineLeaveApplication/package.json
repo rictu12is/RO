@@ -1,0 +1,17 @@
+{
+  "name": "flatpickr-blazor",
+  "version": "1.0.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "copy": "gulp copy && gulp copyLoc && gulp copyPlugins"
+  },
+  "author": "Mathis Logemann",
+  "license": "MIT",
+  "dependencies": {
+    "flatpickr": "^4.6.9"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2"
+  }
+}

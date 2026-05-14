@@ -1,0 +1,602 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<style>
+    /* Style Saturdays in red */
+    .flatpickr-day.weekend {
+        color: indianred !important;
+        /*font-weight: bold;*/
+        cursor: not-allowed !important;
+    }
+</style>
+<h5>Application Status</h5>
+<!-- Info boxes -->
+<div class="row">
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box">
+            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-stamp"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">For Certification</span>
+                <span class="info-box-number">
+                    @ViewBag.ForCertification
+                </span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+    <!-- fix for small devices only -->
+    <div class="clearfix hidden-md-up"></div>
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+            <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-file-signature"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">For Review</span>
+                <span class="info-box-number">@ViewBag.ForReview</span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+            <span class="info-box-icon bg-success elevation-1"><i class="fas fa-thumbs-up"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Approved</span>
+                <span class="info-box-number">@ViewBag.Approved</span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+    <div class="col-12 col-sm-6 col-md-3">
+        <div class="info-box mb-3">
+            <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-down"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Disapproved</span>
+                <span class="info-box-number">@ViewBag.Disapproved</span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+</div>
+<!-- /.row -->
+<hr />
+<h5>Leave Balances</h5>
+<div class="row">
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-suitcase-rolling"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Vacation Leave</span>
+                <span class="info-box-number">6</span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-maroon"><i class="fas fa-stethoscope"></i></span>
+
+            <div class="info-box-content">
+                <span class="info-box-text">Sick Leave</span>
+                <span class="info-box-number">4</span>
+            </div>
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+    <!-- /.col -->
+</div>
+<hr />
+<table id="table_leave" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Date Applied</th>
+            <th>Leave Detail</th>
+            <th>Total Number of Days</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    var table_leavedetail;
+    var editingLeaveRow = null;
+
+    function getStatusBadge(status) {
+        var badgeClass = {
+            'Draft': 'badge-secondary',
+            'For Review': 'badge-primary',
+            'Reviewed': 'badge-warning',
+            'For Approval': 'badge-warning',
+            'Approved': 'badge-success',
+            'Returned': 'badge-danger'
+        }[status] || 'badge-secondary';
+
+        return '<span class="badge ' + badgeClass + '">' + status + '</span>';
+    }
+
+    $(function () {
+        var table_leave = $('#table_leave').DataTable({
+            processing: true,      // Show loading indicator
+            serverSide: true,      // Enable server-side processing
+            autoWidth: false,      // Disable automatic column width calculation
+            lengthChange: false,
+            searching: true,
+            info: true,
+            pageLength: 5,
+            dom: "<'row'<'col-md-6 d-flex'B><'col-md-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            ajax: {
+                "url": "/LeaveApplication/GetLeaveApplications", // URL for server-side processing
+                "type": "POST"
+            },
+            columns: [
+                { "data": "DateApplied", title: 'Date Applied'},
+                { "data": "LeaveDetail", title: 'Leave Detail' },
+                { "data": "TotalNumberofDays", title: 'Total Number of Days', className:'text-center' },
+                {
+                    "data": "Status", title: 'Action',
+                    className: 'text-center',
+                    render: function (data, type, row, meta) {
+                        $("#leaveDetail").html("Date Applied: " + row.DateApplied +
+                            "<br>Leave Detail: " + row.LeaveDetail +
+                            "<br>Day/s: " + row.TotalNumberofDays +
+                            "<br><a href='#'><i class='fas fa-print'></i> Print Leave Form</a>" +
+                            "<br>Attachments: ");
+
+                        if (row.Status == 'Draft' || row.Status == 'Returned') {
+                            return '<a href="#" data-toggle="modal" data-target="#modal-submit" onclick="GetLeaveApplicationID(' + row.LeaveApplicationID + ', \'' + row.Status + '\')"> ' + getStatusBadge(row.Status) + '<br><i class="fas fa-chevron-circle-right"></i></a>';
+                        } else {
+                            return getStatusBadge(row.Status) + '<br><a href="#" onclick="GenerateLeaveApplicationForm(' + row.LeaveApplicationID + ');"><i class="fas fa-print"></i></a>';
+                        }
+                    }
+                },
+            ],
+            buttons: [
+                {
+                    text: "<i class='fas fa-user-tie'></i> Apply for Leave",
+                    className: "btn btn-dark",
+                    attr: {
+                        "data-toggle": "modal",
+                        "data-target": "#modal-lg",
+                    },
+                    action: function (e, dt, node, config) {
+
+                    }
+                },
+                //{
+                //    text: "<i class='fas fa-print'></i> Print Application for Leave",
+                //    className: "btn btn-dark",
+                //    attr: {
+                //        title: 'Please select a record to print',
+                //    },
+                //    action: function (e, dt, node, config) {
+
+                //    }
+                //}
+            ]
+        });
+
+
+        table_leavedetail = $('#table_leavedetail').DataTable({
+            paging: false,
+            lengthChange: false,
+            searching: false,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            columnDefs: [
+                { targets: 3, visible: false }, // Hide the 4th column (JsonData)
+                { targets: 4, orderable: false, className: 'text-center' }
+            ]
+        });
+
+        //Initialize Select2 Elements
+        $('.select2').select2({
+            dropdownParent: $('#modal-sm') // Attach dropdown to modal
+        })
+
+        $('#modal-sm').on('shown.bs.modal', function () {
+            // Force modal-sm on top
+            $('#modal-sm').css("z-index", "1060");
+        });
+        const disabledDates = @Html.Raw(Json.Encode(ViewBag.disabledDates));
+
+        $("#datepicker").flatpickr({
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            enableTime: false,  // Set to true if you need time selection
+            disable: disabledDates,
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                let date = new Date(dayElem.dateObj);
+                if (date.getDay() === 0 || date.getDay() === 6) {
+                    dayElem.classList.add("weekend"); // Add red styling
+                }
+            }
+        });
+
+        $("#btnNewLeave").click(function () {
+            editingLeaveRow = null;
+            resetLeaveDetailForm();
+            $("#btnAddLeave").html('Add to list');
+        });
+
+        $("#btnAddLeave").click(function () {
+            var rowData = buildLeaveDetailRowData();
+            if (editingLeaveRow) {
+                editingLeaveRow.data(rowData).draw(false);
+                editingLeaveRow = null;
+            } else {
+                table_leavedetail.row.add(rowData).draw(false);
+            }
+            resetLeaveDetailForm();
+            $("#btnAddLeave").html('Add to list');
+            $("#modal-sm").modal('hide');
+        });
+
+        $(".btnSubmitLeaveApplication").click(function () {
+            if (this.innerHTML == 'Submit') {
+                $.post("/LeaveApplication/SubmitLeaveApplication", { leaveApplicationID: $("#LeaveApplicationID").val(), remarks: $('textarea[name="Remarks"]').val() }, function (response) {
+                    table_leave.ajax.reload();
+                    $("#modal-submit").modal('hide');
+                }, "json");
+            } else if (this.innerHTML == 'Save Leave Application'){
+                if (table_leavedetail.rows().count() == 0) {
+                    alert('Please add record to submit');
+                } else {
+                    $.post("/LeaveApplication/SaveLeaveApplication", { list: table_leavedetail.column(3).data().toArray() }, function (response) {
+                        alert(response);
+                        table_leave.ajax.reload();
+                        $("#modal-lg").modal('hide');
+                    }, "json");
+                }
+            }
+
+            //else if (this.innerHTML == 'Return') {
+            //    alert(this.innerHTML)
+            //    $.post("/LeaveApplication/SubmitLeaveApplication", { leaveApplicationID: $("#LeaveApplicationID").val(), remarks: $('textarea[name="Remarks"]').val(), isReturned: true }, function (response) {
+            //        table_leave.ajax.reload();
+            //        $("#modal-submit").modal('hide');
+            //    }, "json");
+            //}
+        });
+
+        $(".DL").hide();
+        $(".VLSPL").show();
+        $(".OP").show();
+
+        //$('#modal-sm, #modal-lg').modal({
+        //    backdrop: 'static',
+        //    keyboard: false
+        //});
+
+        $("select[name='TypeOfLeaveID']").change(function () {
+            $(".DL").hide();
+            $(".OP").show();
+            switch (this.value) {
+                case '1': // Vacation Leave
+                case '6': // Special Priviledge Leave
+                    $(".VLSPL").show();
+                    break;
+                case '3': // Sick Leave
+                    $(".SL").show();
+                    break;
+                case '8': // Study Leave
+                    $(".SDL").show();
+                    break;
+                case '11': // Special Leave Benefit for Women
+                    $(".SLBW").show();
+                    break;
+                default:
+                // Code block if no cases match
+                    break;
+            }
+        });
+
+    });
+
+    function buildLeaveDetailRowData() {
+        var LeaveApplicationDetail = _defineObject({}, "form_leave_detail");
+        let leaveDates = $("input[name='LeaveApplicationDetailInclusiveDate']").val()
+            .split(",")
+            .filter(date => date.trim() !== "")
+            .map(date => ({ LeaveDate: date.trim() }));
+        LeaveApplicationDetail.LeaveApplicationDetailInclusiveDates = leaveDates;
+
+        var leaveDetail = '';
+        switch ($("select[name='TypeOfLeaveID']").val()) {
+            case '1': // Vacation Leave
+            case '6': // Special Priviledge Leave
+                leaveDetail = LeaveApplicationDetail.WithinThePhilippinesAbroadLocation;
+                break;
+            case '3': // Sick Leave
+                leaveDetail = LeaveApplicationDetail.InHospitalOutPatientIllness;
+                break;
+            case '8': // Study Leave
+                leaveDetail = LeaveApplicationDetail.CompletionOfMastersDegree ? "Completion of Master's Degree" : "BAR Board Examination Review";
+                break;
+            case '11': // Special Leave Benefit for Women
+                leaveDetail = LeaveApplicationDetail.SpecialLeaveBenefits;
+                break;
+            default:
+                break;
+        }
+
+        return [
+            $("select[name='TypeOfLeaveID'] option:selected").text(),
+            leaveDetail,
+            $("input[name='LeaveApplicationDetailInclusiveDate']").val(),
+            LeaveApplicationDetail,
+            "<button type='button' class='btn btn-sm btn-primary' title='Edit Leave Detail' onclick='editLeaveDetailRow(this);'><i class='fas fa-edit'></i></button> " +
+            "<button type='button' class='btn btn-sm btn-danger' title='Remove Leave Detail' onclick='removeLeaveDetailRow(this);'><i class='fas fa-trash'></i></button>"
+        ];
+    }
+
+    function resetLeaveDetailForm() {
+        $('#form_leave_detail').trigger('reset');
+        $("select[name='TypeOfLeaveID']").val('').trigger('change');
+        $("input[name='LeaveApplicationDetailInclusiveDate']").val('');
+        if (document.querySelector("#datepicker")._flatpickr) {
+            document.querySelector("#datepicker")._flatpickr.clear();
+        }
+        $(".DL").hide();
+        $(".OP").show();
+    }
+
+    function editLeaveDetailRow(button) {
+        editingLeaveRow = table_leavedetail.row($(button).closest('tr'));
+        var rowData = editingLeaveRow.data();
+        var leaveDetail = rowData[3];
+
+        populateLeaveDetailForm(leaveDetail);
+        $("#btnAddLeave").html('Update list');
+        $("#modal-sm").modal('show');
+    }
+
+    function removeLeaveDetailRow(button) {
+        if (!confirm('Remove this leave detail?')) {
+            return;
+        }
+
+        var row = table_leavedetail.row($(button).closest('tr'));
+        if (editingLeaveRow && row.index() === editingLeaveRow.index()) {
+            editingLeaveRow = null;
+            resetLeaveDetailForm();
+            $("#btnAddLeave").html('Add to list');
+        }
+
+        row.remove().draw(false);
+    }
+
+    function populateLeaveDetailForm(leaveDetail) {
+        resetLeaveDetailForm();
+        $("select[name='TypeOfLeaveID']").val(leaveDetail.TypeOfLeaveID).trigger('change');
+
+        var inclusiveDates = (leaveDetail.LeaveApplicationDetailInclusiveDates || [])
+            .map(date => date.LeaveDate)
+            .join(", ");
+        $("input[name='LeaveApplicationDetailInclusiveDate']").val(inclusiveDates);
+        if (document.querySelector("#datepicker")._flatpickr) {
+            document.querySelector("#datepicker")._flatpickr.setDate(inclusiveDates.split(",").map(date => date.trim()).filter(date => date !== ""), true);
+        }
+
+        $("input[name='WithinThePhilippines']").prop('checked', leaveDetail.WithinThePhilippines === true);
+        $("input[name='WithinThePhilippinesAbroadLocation']").val(leaveDetail.WithinThePhilippinesAbroadLocation || '');
+        $("input[name='InHospital']").prop('checked', leaveDetail.InHospital === true);
+        $("input[name='InHospitalOutPatientIllness']").val(leaveDetail.InHospitalOutPatientIllness || '');
+        $("input[name='SpecialLeaveBenefits']").val(leaveDetail.SpecialLeaveBenefits || '');
+        $("input[name='CompletionOfMastersDegree']").prop('checked', leaveDetail.CompletionOfMastersDegree === true);
+        $("input[name='BARBoardExaminationReview']").prop('checked', leaveDetail.BARBoardExaminationReview === true);
+        $("input[name='MonetizationOfLeaveCredits']").prop('checked', leaveDetail.MonetizationOfLeaveCredits === true);
+        $("input[name='TerminalLeave']").prop('checked', leaveDetail.TerminalLeave === true);
+    }
+
+    function GetLeaveApplicationID(id, status) {
+        $("#LeaveApplicationID").val(id);
+        $($(".btnSubmitLeaveApplication")[2]).html('Submit');
+        //$("#returnBtn").prop("disabled", status == 'Returned' ? true : false);
+    }
+
+    function GenerateLeaveApplicationForm(id) {
+        var url = '/Report/GenerateReport?id=' + id + '&reporttype=' + 'LeaveApplicationForm';
+        window.open(url, '_blank');
+    }
+
+</script>
+
+<!-- Modals -->
+<div class="modal fade" id="modal-sm" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Details of Application</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_leave_detail">
+                    <div class="form-group">
+                        @Html.Label("TYPE OF LEAVE TO BE AVAILED OF")
+                        @Html.DropDownList("TypeOfLeaveID", ViewBag.TypeOfLeaves as List<SelectListItem>, "-- Select Type Of Leave --", new { @class = "form-control select2 select2-danger", @style = "width: 100%", @name = "TypeOfLeaveID", data_dropdown_css_class = "select2-danger" })
+                    </div>
+                    <!-- /.form-group -->
+                    <!-- DETAILS OF LEAVE -->
+                    <div class="form-group">
+                        <label>NUMBER OF WORKING DAYS APPLIED FOR</label>
+                        <input type="text" id="datepicker" class="form-control" name="LeaveApplicationDetailInclusiveDate" title="Please choose date/s" />
+                    </div>
+
+                    <!-- Vacation/Special Privilege Leave -->
+                    <div class="form-group DL VLSPL">
+                        <label>In case of Vacation/Special Privilege Leave:</label>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary1" checked name="WithinThePhilippines">
+                            <label for="checkboxPrimary1">
+                                Within the Philippines
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group DL VLSPL">
+                        <label>Specify, location</label>
+                        <input type="text" class="form-control" name="WithinThePhilippinesAbroadLocation" />
+                    </div>
+                    <!-- / Vacation/Special Privilege Leave -->
+                    <!-- Sick Leave -->
+                    <div class="form-group DL SL">
+                        <label>In case of Sick Leave:</label>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary2" name="InHospital">
+                            <label for="checkboxPrimary2">
+                                In Hospital
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group DL SL">
+                        <label>Specify, Illness</label>
+                        <input type="text" class="form-control" name="InHospitalOutPatientIllness" />
+                    </div>
+                    <!-- / Sick Leave -->
+                    <!-- Special Leave -->
+                    <div class="form-group DL SLBW">
+                        <label>In case of Special Leave Benefits for Women:</label>
+                        <div class="form-group">
+                            <label>Specify, Illness</label>
+                            <input type="text" class="form-control" name="SpecialLeaveBenefits" />
+                        </div>
+                    </div>
+                    <!-- / Special Leave -->
+
+                    <div class="form-group DL SDL">
+                        <label>In case of Study Leave:</label>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary3" name="CompletionOfMastersDegree">
+                            <label for="checkboxPrimary3">
+                                Completion of Master's Degree
+                            </label>
+                        </div>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary4" name="BARBoardExaminationReview">
+                            <label for="checkboxPrimary4">
+                                BAR/Board Examination Review
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group DL OP">
+                        <label>Other Purpose:</label>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary5" name="MonetizationOfLeaveCredits">
+                            <label for="checkboxPrimary5">
+                                Monetization of Leave Credits
+                            </label>
+                        </div>
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="checkboxPrimary6" name="TerminalLeave">
+                            <label for="checkboxPrimary6">
+                                Terminal Leave
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddLeave">Add to list</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="modal-lg" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">LEAVE APPLICATION DETAILS</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <button type="button" class="btn btn-dark" id="btnNewLeave" data-toggle="modal" data-target="#modal-sm">
+                    Add Leave Type
+                </button>
+                <br />
+                <br />
+                <!-- Table Leaves -->
+                <table class="table table-hover" id="table_leavedetail">
+                    <thead>
+                        <tr>
+                            <th>Type of Leave</th>
+                            <th>Details of Leave</th>
+                            <th>Day/s of Leave</th>
+                            <th>JsonData</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary btnSubmitLeaveApplication">Save Leave Application</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<input type="hidden" id="LeaveApplicationID" />
+<div class="modal fade" id="modal-submit" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Leave Application Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="leaveDetail"></div>
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <textarea rows="3" class="form-control" name="Remarks"></textarea>
+                </div>
+
+                <!-- Inline buttons -->
+                @*<button type="button" class="btn btn-danger d-inline-block btnSubmitLeaveApplication" id="returnBtn">Return</button>*@
+                <button type="button" class="btn btn-success d-inline-block float-right btnSubmitLeaveApplication">Submit</button>
+            </div>
+            <div class="modal-footer justify-content-between">
+                @*<button type="button" class="btn btn-primary btnSubmitLeaveApplication">Submit Leave Application</button>*@
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

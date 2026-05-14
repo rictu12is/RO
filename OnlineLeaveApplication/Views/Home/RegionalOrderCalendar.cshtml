@@ -1,0 +1,40 @@
+@{
+    ViewBag.Title = "Regional Order Calendar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">My Regional Orders Calendar</h3>
+    </div>
+    <div class="card-body p-0">
+        <div id="regional-order-calendar" class="p-3"></div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var calendarEl = document.getElementById('regional-order-calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: ['bootstrap', 'dayGrid', 'timeGrid'],
+            themeSystem: 'bootstrap',
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            defaultView: 'dayGridMonth',
+            eventLimit: true,
+            events: '/RegionalOrder/GetMyRegionalOrderCalendarEvents',
+            eventClick: function (info) {
+                if (info.event.url) {
+                    info.jsEvent.preventDefault();
+                    window.open(info.event.url, '_blank');
+                }
+            }
+        });
+
+        calendar.render();
+    });
+</script>

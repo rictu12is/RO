@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewBag.Title = "My Regional Orders";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table id="table_regional_orders" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(function () {
+        var table_regional_orders = $('#table_regional_orders').DataTable({
+            processing: true,      // Show loading indicator
+            serverSide: true,      // Enable server-side processing
+            autoWidth: false,      // Disable automatic column width calculation
+            lengthChange: false,
+            searching: true,
+            info: true,
+            pageLength: 5, 
+            ajax: {
+                "url": "/RegionalOrder/GetMyRegionalOrders", // URL for server-side processing
+                "type": "POST"
+            },
+            columns: [
+                {
+                    data: "RegionalOrderNumber", title: 'Regional Order No.',
+                    render: function (data, type, row, meta) {
+                        //`<a href="/Home/DisplayFile?id=" title="${res[2]}" target="_blank"><i class="fas fa-file-pdf"></i></a>`
+                        // fas fa-print
+                        var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
+                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong><a/>`; // Example: Make text bold
+                    }
+                },
+                {
+                    title: 'Title/ Date Issued',
+                    render: function (data, type, row, meta) {
+                        return row.Title + '<br><b>' + row.RegionalOrderDate + '' +
+                            ` | Participants:</b> <a href="#" onclick="getData('` + row.DILGPersonnel + `','` + row.RegionalOrderNumber + `');" data-toggle="modal" data-target="#modal_list_personnel"><i class="fas fa-users"></i></a>`
+                    }
+                },
+                {
+                    title: 'Venue/Pax',
+                    render: function (data, type, row, meta) {
+                        return row.Venue
+                    }
+                },
+            ], 
+        });
+    });
+</script>
+ 

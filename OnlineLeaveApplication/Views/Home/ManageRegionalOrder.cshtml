@@ -1,0 +1,358 @@
+﻿
+@{
+    ViewBag.Title = "ManageRegionalOrder";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table id="table_regional_orders" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    $(function () {
+        $("#datepicker").flatpickr({
+            altInput: true,
+            dateFormat: "Y-m-d",
+            enableTime: false,  // Set to true if you need time selection
+            //onDayCreate: function (dObj, dStr, fp, dayElem) {
+            //    let date = new Date(dayElem.dateObj);
+            //    if (date.getDay() === 0 || date.getDay() === 6) {
+            //        dayElem.classList.add("weekend"); // Add red styling
+            //    }
+            //}
+        });
+
+        $("#datepicker_activityDate").flatpickr({
+            mode: "multiple",
+            dateFormat: "Y-m-d",
+            enableTime: false,  // Set to true if you need time selection
+            onDayCreate: function (dObj, dStr, fp, dayElem) {
+                let date = new Date(dayElem.dateObj);
+                if (date.getDay() === 0 || date.getDay() === 6) {
+                    dayElem.classList.add("weekend"); // Add red styling
+                }
+            }
+        });
+        var table_regional_orders = $('#table_regional_orders').DataTable({
+            processing: true,      // Show loading indicator
+            serverSide: true,      // Enable server-side processing
+            autoWidth: false,      // Disable automatic column width calculation
+            lengthChange: false,
+            searching: true,
+            info: true,
+            pageLength: 5,
+            dom: "<'row'<'col-md-6 d-flex'B><'col-md-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            ajax: {
+                "url": "/RegionalOrder/GetRegionalOrders", // URL for server-side processing
+                "type": "POST"
+            },
+            columns: [
+                {
+                    data: "RegionalOrderNumber", title: 'Regional Order No.',
+                    render: function (data, type, row, meta) {
+                        //`<a href="/Home/DisplayFile?id=" title="${res[2]}" target="_blank"><i class="fas fa-file-pdf"></i></a>`
+                        // fas fa-print
+                        var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
+                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong><a/>` ; // Example: Make text bold
+                    }
+                },
+                {
+                    title: 'Title/ Date Issued',
+                    render: function (data, type, row, meta) {
+                        return row.Title + '<br><b>' + row.RegionalOrderDate + '' +
+                            ` | Participants:</b> <a href="#" onclick="getData('` + row.DILGPersonnel + `','` + row.RegionalOrderNumber + `');" data-toggle="modal" data-target="#modal_list_personnel"><i class="fas fa-users"></i></a>`
+                    }
+                },
+                {
+                    title: 'Venue/Pax',
+                    render: function (data, type, row, meta) { 
+                        return row.Venue
+                    }
+                },   
+            ],
+            buttons: [
+                {
+                    text: "<i class='fas fa-user-tie'></i> New Regional Order",
+                    className: "btn btn-dark",
+                    attr: {
+                        "data-toggle": "modal",
+                        "data-target": "#modal_new_ro",
+                    },
+                    action: function (e, dt, node, config) {
+
+                    }
+                },
+            ]
+        });
+
+        var table_personnel = $('#table_personnel').DataTable({
+            paging: false,
+            lengthChange: false,
+            searching: false,
+            ordering: true,
+            info: true,
+            autoWidth: false,
+            columnDefs: [
+                { targets: 3, visible: false } // Hides the second column (index starts from 0)
+            ],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: '<i class="fas fa-user-plus"></i> Add Personnel',
+                    className: 'btn btn-dark',
+                    attr: {
+                        "data-toggle": "modal",
+                        "data-target": "#modal_personnel",
+                    },
+                },
+                {
+                    text: '<i class="fas fa-paperclip"></i> Attach File',
+                    className: 'btn btn-danger',
+                    attr: {
+                        "id": "attachFile",
+                    },
+                    action: function () {
+                        $("#fileUpload").click(); // Trigger hidden file input
+                    }
+                }
+            ]
+        });
+
+        $("#btnAddList").click(function () {
+            table_personnel.row.add([
+                $("select[name='EmployeeID'] option:selected").text(),
+                $("input[name='ActivityDate']").val(),
+                $("input[name='Remarks']").val(),
+                $("select[name='EmployeeID']").val(),
+                "<button type='button' class='btn btn-sm btn-danger btn-remove-personnel' title='Remove Personnel'><i class='fas fa-trash'></i></button>"
+            ]).draw(false); // false keeps pagination position
+            $("#modal_personnel").modal('hide');
+        });
+
+        $('#table_personnel tbody').on('click', '.btn-remove-personnel', function () {
+            table_personnel.row($(this).closest('tr')).remove().draw(false);
+        });
+
+        $("#fileUpload").change(function () {
+            var file = this.files[0]; // 'this' refers to the input element
+            if (file) {
+                $("#attachFile").html('<i class="fas fa-file"></i> File Attached');
+                $("#attachFile").attr('class', 'btn btn-primary');
+                $("#attachFile").attr("disabled", true);
+            } else {
+                alert("No file selected.");
+            }
+        });
+
+
+
+        $("#form_regional_order").submit(function (event) {
+            event.preventDefault(); // Prevent full page reload
+
+            var file = $("#fileUpload")[0].files[0]; // Get the selected file
+            var formData = new FormData();
+            formData.append("file", file); // Append file
+
+            var RegionalOrder = _defineObject({}, "form_regional_order");
+
+            var employees = table_personnel.data().toArray();//.map(d => ({ ActivityDate: d.trim() }));
+            var RegionalOrderDetails = [];
+            // Loop through each object and get its data
+            employees.forEach(employee => {
+
+                var dates = employee[1].split(",").map(d => ({ ActivityDate: d.trim() }));
+
+                RegionalOrderDetails.push({
+                    EmployeeID: employee[3],
+                    Venue: $("input[name='Venue']").val(),
+                    Remarks: employee[2],
+                    RegionalOrderDetailDates: dates
+                });
+            });
+            RegionalOrder.RegionalOrderDetails = RegionalOrderDetails;
+            formData.append("jsonData", JSON.stringify(RegionalOrder));
+
+            $.ajax({
+                url: "/RegionalOrder/SaveRegionalOrder", // Your backend endpoint
+                type: "POST",
+                data: formData,
+                processData: false,  // Prevent jQuery from converting data
+                contentType: false,  // Ensure correct form submission
+                beforeSend: function () {
+                    if (!file) {
+                        alert("Please attach file!");
+                        return false;
+                    }
+                },
+                success: function (response) {
+                    $("#attachFile").html('<i class="fas fa-paperclip"></i> Attach File');
+                    $("#attachFile").attr('class', 'btn btn-secondary btn-danger');
+                    $("#attachFile").attr("disabled", false);
+                    $("#modal_new_ro").modal('hide');
+                    $('#fileUpload').val('');
+                    table_regional_orders.ajax.reload();
+                },
+                error: function (xhr, status, error) {
+                    alert(xhr.responseJSON || xhr.responseText || "Unable to save regional order.");
+                }
+            });
+        });
+
+        $('#modal_new_ro').on('hide.bs.modal', function () {
+            $(this).find('form')[0].reset();
+            $("#attachFile").html('<i class="fas fa-paperclip"></i> Attach File');
+            $("#attachFile").attr('class', 'btn btn-secondary btn-danger');
+            $("#attachFile").attr("disabled", false);
+            $('#fileUpload').val('');
+        });
+
+    });
+
+    function getData(obj, RONo) {
+        $("#list_personnel").html('');
+        $("#pax").html('RO No.: '+RONo);
+        $.each(obj.split("|"), (_, item) =>
+            $("#list_personnel").append(`<li>${item}</li>`)
+        ); 
+    }
+</script>
+<div class="modal fade" id="modal_new_ro" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Regional Order Information</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form_regional_order">
+                <input type="file" name="file" class="form-control" id="fileUpload" accept="application/pdf,.pdf" hidden />
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group col-4">
+                            <label>Regional Order Number</label>
+                            <input type="text" class="form-control" name="RegionalOrderNumber" maxlength="10" />
+                        </div>
+                        <div class="form-group col-4">
+                            <label>Date Issued</label>
+                            <input type="text" id="datepicker" class="form-control" name="RegionalOrderDate" title="Please choose date" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-12">
+                            <label>Venue</label>
+                            <input type="text" class="form-control" name="Venue" maxlength="150" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-12">
+                            <label>Title</label>
+                            <textarea class="form-control" rows="3" placeholder="Enter title..." name="Title" maxlength="350"></textarea>
+                        </div>
+                    </div>
+                    <hr />
+                    <h4>DILG Personnel</h4>
+                    <table id="table_personnel" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Personnel</th>
+                                <th>Date/s</th>
+                                <th>Remarks</th>
+                                <th>EmployeeID</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <hr />
+                    <div class="icheck-primary d-inline">
+                        <input type="checkbox" id="isCompensatoryOvertimeCredit" name="isCompensatoryOvertimeCredit">
+                        <label for="isCompensatoryOvertimeCredit">
+                            Availment of Compensatory Overtime Credit (COC)
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- Modals -->
+<div class="modal fade" id="modal_personnel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Details of Application</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form_personnel">
+                    <div class="form-group">
+                        @Html.Label("List of DILG Personnel")
+                        @Html.DropDownList("EmployeeID", ViewBag.Employees as List<SelectListItem>, "-- Select DILG Personnel --", new { @class = "form-control select2 select2-danger", @style = "width: 100%", @name = "EmployeeID", data_dropdown_css_class = "select2-danger" })
+                    </div>
+                    <div class="form-group">
+                        <label>Date/s</label>
+                        <input type="text" id="datepicker_activityDate" class="form-control" name="ActivityDate" />
+                    </div>
+                    <div class="form-group">
+                        <label>Remarks</label>
+                        <input type="text" class="form-control" name="Remarks" maxlength="250" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnAddList">Add to list</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+<!-- Modals -->
+<div class="modal fade" id="modal_list_personnel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="max-width: 500px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="pax"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card-body">
+                    <h4>DILG Personnel</h4>
+                    <ol id="list_personnel">
+                         
+                    </ol>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> 
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

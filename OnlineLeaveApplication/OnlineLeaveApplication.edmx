@@ -1,0 +1,1214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="OnlineLeaveApplicationModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="CTOApplication">
+          <Key>
+            <PropertyRef Name="CTOApplicationID" />
+          </Key>
+          <Property Name="CTOApplicationID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmployeeID" Type="smallint" />
+          <Property Name="DateApplied" Type="date" />
+        </EntityType>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="smallint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LastName" Type="varchar" MaxLength="30" />
+          <Property Name="FirstName" Type="varchar" MaxLength="30" />
+          <Property Name="MiddleName" Type="varchar" MaxLength="30" />
+          <Property Name="ContactNumber" Type="char" MaxLength="11" />
+          <Property Name="EmailAddress" Type="varchar" MaxLength="30" />
+          <Property Name="PositionID" Type="tinyint" />
+          <Property Name="OfficeID" Type="tinyint" />
+          <Property Name="Username" Type="varchar" MaxLength="15" />
+          <Property Name="Password" Type="varchar" MaxLength="15" />
+        </EntityType>
+        <EntityType Name="LeaveApplication">
+          <Key>
+            <PropertyRef Name="LeaveApplicationID" />
+          </Key>
+          <Property Name="LeaveApplicationID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EmployeeID" Type="smallint" />
+          <Property Name="DateApplied" Type="datetime" />
+          <Property Name="ReceivedBy" Type="smallint" />
+          <Property Name="ReviewedBy" Type="smallint" />
+          <Property Name="ApprovedBy" Type="smallint" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationAttachment">
+          <Key>
+            <PropertyRef Name="LeaveApplicationAttachmentID" />
+          </Key>
+          <Property Name="LeaveApplicationAttachmentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LeaveApplicationID" Type="int" />
+          <Property Name="UploadedFile" Type="varbinary(max)" />
+          <Property Name="FileName" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationDetail">
+          <Key>
+            <PropertyRef Name="LeaveApplicationDetailID" />
+          </Key>
+          <Property Name="LeaveApplicationDetailID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LeaveApplicationID" Type="int" />
+          <Property Name="TypeOfLeaveID" Type="tinyint" />
+          <Property Name="WithinThePhilippines" Type="bit" />
+          <Property Name="WithinThePhilippinesAbroadLocation" Type="varchar" MaxLength="150" />
+          <Property Name="InHospital" Type="bit" />
+          <Property Name="InHospitalOutPatientIllness" Type="varchar" MaxLength="150" />
+          <Property Name="SpecialLeaveBenefits" Type="varchar" MaxLength="150" />
+          <Property Name="CompletionOfMastersDegree" Type="bit" />
+          <Property Name="BARBoardExaminationReview" Type="bit" />
+          <Property Name="MonetizationOfLeaveCredits" Type="bit" />
+          <Property Name="TerminalLeave" Type="bit" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationDetailInclusiveDate">
+          <Key>
+            <PropertyRef Name="LeaveApplicationDetailInclusiveDateID" />
+          </Key>
+          <Property Name="LeaveApplicationDetailInclusiveDateID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LeaveApplicationDetailID" Type="int" />
+          <Property Name="LeaveDate" Type="date" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationSubmission">
+          <Key>
+            <PropertyRef Name="LeaveApplicationSubmissionID" />
+          </Key>
+          <Property Name="LeaveApplicationSubmissionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LeaveApplicationID" Type="int" />
+          <Property Name="SubmittedBy" Type="smallint" />
+          <Property Name="DateSubmitted" Type="datetime" />
+          <Property Name="ReceivedBy" Type="smallint" />
+          <Property Name="Status" Type="smallint" />
+          <Property Name="Remarks" Type="varchar" MaxLength="150" />
+        </EntityType>
+        <EntityType Name="MainOffice">
+          <Key>
+            <PropertyRef Name="MainOfficeID" />
+          </Key>
+          <Property Name="MainOfficeID" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MainOfficeName" Type="nvarchar" MaxLength="100" />
+          <Property Name="ForInitialReview" Type="smallint" />
+          <Property Name="ForReview" Type="smallint" />
+          <Property Name="ForApproval" Type="smallint" />
+        </EntityType>
+        <EntityType Name="Office">
+          <Key>
+            <PropertyRef Name="OfficeID" />
+          </Key>
+          <Property Name="OfficeID" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="OfficeName" Type="varchar" MaxLength="50" />
+          <Property Name="Abbr" Type="varchar" MaxLength="50" />
+          <Property Name="Description" Type="varchar" MaxLength="250" />
+          <Property Name="MainOfficeID" Type="tinyint" />
+        </EntityType>
+        <EntityType Name="Position">
+          <Key>
+            <PropertyRef Name="PositionID" />
+          </Key>
+          <Property Name="PositionID" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PositionName" Type="varchar" MaxLength="100" />
+          <Property Name="Abbr" Type="varchar" MaxLength="30" />
+        </EntityType>
+        <EntityType Name="RegionalOrder">
+          <Key>
+            <PropertyRef Name="RegionalOrderID" />
+          </Key>
+          <Property Name="RegionalOrderID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RegionalOrderNumber" Type="varchar" MaxLength="10" />
+          <Property Name="Title" Type="varchar" MaxLength="350" />
+          <Property Name="RegionalOrderDate" Type="date" />
+          <Property Name="Signatory" Type="smallint" />
+          <Property Name="isCompensatoryOvertimeCredit" Type="bit" />
+          <Property Name="Remarks" Type="varchar" MaxLength="250" />
+          <Property Name="UploadedFile" Type="varbinary(max)" />
+          <Property Name="FilePath" Type="nvarchar" MaxLength="260" />
+          <Property Name="OriginalFileName" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="RegionalOrderDetail">
+          <Key>
+            <PropertyRef Name="RegionalOrderDetailID" />
+          </Key>
+          <Property Name="RegionalOrderDetailID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RegionalOrderID" Type="int" />
+          <Property Name="EmployeeID" Type="smallint" />
+          <Property Name="Venue" Type="varchar" MaxLength="150" />
+          <Property Name="Remarks" Type="varchar" MaxLength="250" />
+        </EntityType>
+        <EntityType Name="RegionalOrderDetailDate">
+          <Key>
+            <PropertyRef Name="RegionalOrderDetailDateID" />
+          </Key>
+          <Property Name="RegionalOrderDetailDateID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RegionalOrderDetailID" Type="int" />
+          <Property Name="ActivityDate" Type="date" />
+        </EntityType>
+        <EntityType Name="TypeOfLeave">
+          <Key>
+            <PropertyRef Name="TypeOfLeaveID" />
+          </Key>
+          <Property Name="TypeOfLeaveID" Type="tinyint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TypeOfLeave" Type="varchar" MaxLength="250" />
+          <Property Name="LegalBasis" Type="varchar" MaxLength="300" />
+        </EntityType>
+        <Association Name="FK_CTOApplication_Employee">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="CTOApplication" Type="Self.CTOApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="CTOApplication">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employee_Office">
+          <End Role="Office" Type="Self.Office" Multiplicity="0..1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Office">
+              <PropertyRef Name="OfficeID" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="OfficeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employee_Position">
+          <End Role="Position" Type="Self.Position" Multiplicity="0..1" />
+          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Position">
+              <PropertyRef Name="PositionID" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="PositionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee1">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ApprovedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee2">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ReviewedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee3">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ReceivedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationAttachment_LeaveApplication">
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="0..1" />
+          <End Role="LeaveApplicationAttachment" Type="Self.LeaveApplicationAttachment" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationAttachment">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetail_LeaveApplication">
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="0..1" />
+          <End Role="LeaveApplicationDetail" Type="Self.LeaveApplicationDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetail">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetail_TypeOfLeave">
+          <End Role="TypeOfLeave" Type="Self.TypeOfLeave" Multiplicity="0..1" />
+          <End Role="LeaveApplicationDetail" Type="Self.LeaveApplicationDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeOfLeave">
+              <PropertyRef Name="TypeOfLeaveID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetail">
+              <PropertyRef Name="TypeOfLeaveID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail">
+          <End Role="LeaveApplicationDetail" Type="Self.LeaveApplicationDetail" Multiplicity="0..1" />
+          <End Role="LeaveApplicationDetailInclusiveDate" Type="Self.LeaveApplicationDetailInclusiveDate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplicationDetail">
+              <PropertyRef Name="LeaveApplicationDetailID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetailInclusiveDate">
+              <PropertyRef Name="LeaveApplicationDetailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationSubmission_LeaveApplication">
+          <End Role="LeaveApplication" Type="Self.LeaveApplication" Multiplicity="0..1" />
+          <End Role="LeaveApplicationSubmission" Type="Self.LeaveApplicationSubmission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationSubmission">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_InitialReview">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="MainOffice" Type="Self.MainOffice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice">
+              <PropertyRef Name="ForInitialReview" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_Review">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="MainOffice" Type="Self.MainOffice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice">
+              <PropertyRef Name="ForReview" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_Signatory">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="MainOffice" Type="Self.MainOffice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice">
+              <PropertyRef Name="ForApproval" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Office_MainOffice">
+          <End Role="MainOffice" Type="Self.MainOffice" Multiplicity="0..1" />
+          <End Role="Office" Type="Self.Office" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MainOffice">
+              <PropertyRef Name="MainOfficeID" />
+            </Principal>
+            <Dependent Role="Office">
+              <PropertyRef Name="MainOfficeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrder_RegionalOrder">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="RegionalOrder" Type="Self.RegionalOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="RegionalOrder">
+              <PropertyRef Name="Signatory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetail_Employee">
+          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="RegionalOrderDetail" Type="Self.RegionalOrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetail">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetail_RegionalOrder">
+          <End Role="RegionalOrder" Type="Self.RegionalOrder" Multiplicity="0..1" />
+          <End Role="RegionalOrderDetail" Type="Self.RegionalOrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionalOrder">
+              <PropertyRef Name="RegionalOrderID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetail">
+              <PropertyRef Name="RegionalOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetailDate_RegionalOrderDetail">
+          <End Role="RegionalOrderDetail" Type="Self.RegionalOrderDetail" Multiplicity="0..1" />
+          <End Role="RegionalOrderDetailDate" Type="Self.RegionalOrderDetailDate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionalOrderDetail">
+              <PropertyRef Name="RegionalOrderDetailID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetailDate">
+              <PropertyRef Name="RegionalOrderDetailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="OnlineLeaveApplicationModelStoreContainer">
+          <EntitySet Name="CTOApplication" EntityType="Self.CTOApplication" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveApplication" EntityType="Self.LeaveApplication" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveApplicationAttachment" EntityType="Self.LeaveApplicationAttachment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveApplicationDetail" EntityType="Self.LeaveApplicationDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveApplicationDetailInclusiveDate" EntityType="Self.LeaveApplicationDetailInclusiveDate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LeaveApplicationSubmission" EntityType="Self.LeaveApplicationSubmission" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MainOffice" EntityType="Self.MainOffice" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Office" EntityType="Self.Office" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Position" EntityType="Self.Position" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RegionalOrder" EntityType="Self.RegionalOrder" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RegionalOrderDetail" EntityType="Self.RegionalOrderDetail" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RegionalOrderDetailDate" EntityType="Self.RegionalOrderDetailDate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TypeOfLeave" EntityType="Self.TypeOfLeave" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_CTOApplication_Employee" Association="Self.FK_CTOApplication_Employee">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="CTOApplication" EntitySet="CTOApplication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employee_Office" Association="Self.FK_Employee_Office">
+            <End Role="Office" EntitySet="Office" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employee_Position" Association="Self.FK_Employee_Position">
+            <End Role="Position" EntitySet="Position" />
+            <End Role="Employee" EntitySet="Employee" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee" Association="Self.FK_LeaveApplication_Employee">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee1" Association="Self.FK_LeaveApplication_Employee1">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee2" Association="Self.FK_LeaveApplication_Employee2">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee3" Association="Self.FK_LeaveApplication_Employee3">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationAttachment_LeaveApplication" Association="Self.FK_LeaveApplicationAttachment_LeaveApplication">
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+            <End Role="LeaveApplicationAttachment" EntitySet="LeaveApplicationAttachment" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetail_LeaveApplication" Association="Self.FK_LeaveApplicationDetail_LeaveApplication">
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetail_TypeOfLeave" Association="Self.FK_LeaveApplicationDetail_TypeOfLeave">
+            <End Role="TypeOfLeave" EntitySet="TypeOfLeave" />
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail" Association="Self.FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail">
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetail" />
+            <End Role="LeaveApplicationDetailInclusiveDate" EntitySet="LeaveApplicationDetailInclusiveDate" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationSubmission_LeaveApplication" Association="Self.FK_LeaveApplicationSubmission_LeaveApplication">
+            <End Role="LeaveApplication" EntitySet="LeaveApplication" />
+            <End Role="LeaveApplicationSubmission" EntitySet="LeaveApplicationSubmission" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_InitialReview" Association="Self.FK_MainOffice_InitialReview">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="MainOffice" EntitySet="MainOffice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_Review" Association="Self.FK_MainOffice_Review">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="MainOffice" EntitySet="MainOffice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_Signatory" Association="Self.FK_MainOffice_Signatory">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="MainOffice" EntitySet="MainOffice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Office_MainOffice" Association="Self.FK_Office_MainOffice">
+            <End Role="MainOffice" EntitySet="MainOffice" />
+            <End Role="Office" EntitySet="Office" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrder_RegionalOrder" Association="Self.FK_RegionalOrder_RegionalOrder">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="RegionalOrder" EntitySet="RegionalOrder" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetail_Employee" Association="Self.FK_RegionalOrderDetail_Employee">
+            <End Role="Employee" EntitySet="Employee" />
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetail_RegionalOrder" Association="Self.FK_RegionalOrderDetail_RegionalOrder">
+            <End Role="RegionalOrder" EntitySet="RegionalOrder" />
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetail" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetailDate_RegionalOrderDetail" Association="Self.FK_RegionalOrderDetailDate_RegionalOrderDetail">
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetail" />
+            <End Role="RegionalOrderDetailDate" EntitySet="RegionalOrderDetailDate" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="OnlineLeaveApplicationModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="OnlineLeaveApplicationEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Employees" EntityType="OnlineLeaveApplicationModel.Employee" />
+          <EntitySet Name="LeaveApplications" EntityType="OnlineLeaveApplicationModel.LeaveApplication" />
+          <EntitySet Name="LeaveApplicationDetails" EntityType="OnlineLeaveApplicationModel.LeaveApplicationDetail" />
+          <EntitySet Name="LeaveApplicationDetailInclusiveDates" EntityType="OnlineLeaveApplicationModel.LeaveApplicationDetailInclusiveDate" />
+          <EntitySet Name="Offices" EntityType="OnlineLeaveApplicationModel.Office" />
+          <EntitySet Name="Positions" EntityType="OnlineLeaveApplicationModel.Position" />
+          <EntitySet Name="RegionalOrders" EntityType="OnlineLeaveApplicationModel.RegionalOrder" />
+          <EntitySet Name="RegionalOrderDetails" EntityType="OnlineLeaveApplicationModel.RegionalOrderDetail" />
+          <EntitySet Name="RegionalOrderDetailDates" EntityType="OnlineLeaveApplicationModel.RegionalOrderDetailDate" />
+          <EntitySet Name="TypeOfLeaves" EntityType="OnlineLeaveApplicationModel.TypeOfLeave" />
+          <AssociationSet Name="FK_Employee_Office" Association="OnlineLeaveApplicationModel.FK_Employee_Office">
+            <End Role="Office" EntitySet="Offices" />
+            <End Role="Employee" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Employee_Position" Association="OnlineLeaveApplicationModel.FK_Employee_Position">
+            <End Role="Position" EntitySet="Positions" />
+            <End Role="Employee" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee" Association="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee1" Association="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee1">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee2" Association="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee2">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplication_Employee3" Association="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee3">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrder_RegionalOrder" Association="OnlineLeaveApplicationModel.FK_RegionalOrder_RegionalOrder">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="RegionalOrder" EntitySet="RegionalOrders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetail_Employee" Association="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_Employee">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetail_LeaveApplication" Association="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_LeaveApplication">
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetail_TypeOfLeave" Association="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_TypeOfLeave">
+            <End Role="TypeOfLeave" EntitySet="TypeOfLeaves" />
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail" Association="OnlineLeaveApplicationModel.FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail">
+            <End Role="LeaveApplicationDetail" EntitySet="LeaveApplicationDetails" />
+            <End Role="LeaveApplicationDetailInclusiveDate" EntitySet="LeaveApplicationDetailInclusiveDates" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetail_RegionalOrder" Association="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_RegionalOrder">
+            <End Role="RegionalOrder" EntitySet="RegionalOrders" />
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK_RegionalOrderDetailDate_RegionalOrderDetail" Association="OnlineLeaveApplicationModel.FK_RegionalOrderDetailDate_RegionalOrderDetail">
+            <End Role="RegionalOrderDetail" EntitySet="RegionalOrderDetails" />
+            <End Role="RegionalOrderDetailDate" EntitySet="RegionalOrderDetailDates" />
+          </AssociationSet>
+          <EntitySet Name="LeaveApplicationSubmissions" EntityType="OnlineLeaveApplicationModel.LeaveApplicationSubmission" />
+          <AssociationSet Name="FK_LeaveApplicationSubmission_LeaveApplication" Association="OnlineLeaveApplicationModel.FK_LeaveApplicationSubmission_LeaveApplication">
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+            <End Role="LeaveApplicationSubmission" EntitySet="LeaveApplicationSubmissions" />
+          </AssociationSet>
+          <EntitySet Name="CTOApplications" EntityType="OnlineLeaveApplicationModel.CTOApplication" />
+          <EntitySet Name="LeaveApplicationAttachments" EntityType="OnlineLeaveApplicationModel.LeaveApplicationAttachment" />
+          <EntitySet Name="MainOffices" EntityType="OnlineLeaveApplicationModel.MainOffice" />
+          <AssociationSet Name="FK_CTOApplication_Employee" Association="OnlineLeaveApplicationModel.FK_CTOApplication_Employee">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="CTOApplication1" EntitySet="CTOApplications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_InitialReview1" Association="OnlineLeaveApplicationModel.FK_MainOffice_InitialReview1">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="MainOffice1" EntitySet="MainOffices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_Review1" Association="OnlineLeaveApplicationModel.FK_MainOffice_Review1">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="MainOffice1" EntitySet="MainOffices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_MainOffice_Signatory1" Association="OnlineLeaveApplicationModel.FK_MainOffice_Signatory1">
+            <End Role="Employee" EntitySet="Employees" />
+            <End Role="MainOffice1" EntitySet="MainOffices" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LeaveApplicationAttachment_LeaveApplication1" Association="OnlineLeaveApplicationModel.FK_LeaveApplicationAttachment_LeaveApplication1">
+            <End Role="LeaveApplication" EntitySet="LeaveApplications" />
+            <End Role="LeaveApplicationAttachment1" EntitySet="LeaveApplicationAttachments" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Office_MainOffice" Association="OnlineLeaveApplicationModel.FK_Office_MainOffice">
+            <End Role="MainOffice1" EntitySet="MainOffices" />
+            <End Role="Office" EntitySet="Offices" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Employee">
+          <Key>
+            <PropertyRef Name="EmployeeID" />
+          </Key>
+          <Property Name="EmployeeID" Type="Int16" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LastName" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="FirstName" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="MiddleName" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="ContactNumber" Type="String" MaxLength="11" FixedLength="true" Unicode="false" />
+          <Property Name="EmailAddress" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="PositionID" Type="Byte" />
+          <Property Name="OfficeID" Type="Byte" />
+          <Property Name="Username" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <Property Name="Password" Type="String" MaxLength="15" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Office" Relationship="OnlineLeaveApplicationModel.FK_Employee_Office" FromRole="Employee" ToRole="Office" />
+          <NavigationProperty Name="Position" Relationship="OnlineLeaveApplicationModel.FK_Employee_Position" FromRole="Employee" ToRole="Position" />
+          <NavigationProperty Name="LeaveApplications" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee" FromRole="Employee" ToRole="LeaveApplication" />
+          <NavigationProperty Name="LeaveApplications1" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee1" FromRole="Employee" ToRole="LeaveApplication" />
+          <NavigationProperty Name="LeaveApplications2" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee2" FromRole="Employee" ToRole="LeaveApplication" />
+          <NavigationProperty Name="LeaveApplications3" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee3" FromRole="Employee" ToRole="LeaveApplication" />
+          <NavigationProperty Name="RegionalOrders" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrder_RegionalOrder" FromRole="Employee" ToRole="RegionalOrder" />
+          <NavigationProperty Name="RegionalOrderDetails" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_Employee" FromRole="Employee" ToRole="RegionalOrderDetail" />
+          <NavigationProperty Name="CTOApplications" Relationship="OnlineLeaveApplicationModel.FK_CTOApplication_Employee" FromRole="Employee" ToRole="CTOApplication1" />
+          <NavigationProperty Name="MainOffices3" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_InitialReview1" FromRole="Employee" ToRole="MainOffice1" />
+          <NavigationProperty Name="MainOffices11" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_Review1" FromRole="Employee" ToRole="MainOffice1" />
+          <NavigationProperty Name="MainOffices21" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_Signatory1" FromRole="Employee" ToRole="MainOffice1" />
+        </EntityType>
+        <EntityType Name="LeaveApplication">
+          <Key>
+            <PropertyRef Name="LeaveApplicationID" />
+          </Key>
+          <Property Name="LeaveApplicationID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeID" Type="Int16" />
+          <Property Name="DateApplied" Type="DateTime" Precision="3" />
+          <Property Name="ReceivedBy" Type="Int16" />
+          <Property Name="ReviewedBy" Type="Int16" />
+          <Property Name="ApprovedBy" Type="Int16" />
+          <NavigationProperty Name="Employee" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee" FromRole="LeaveApplication" ToRole="Employee" />
+          <NavigationProperty Name="Employee1" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee1" FromRole="LeaveApplication" ToRole="Employee" />
+          <NavigationProperty Name="Employee2" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee2" FromRole="LeaveApplication" ToRole="Employee" />
+          <NavigationProperty Name="Employee3" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplication_Employee3" FromRole="LeaveApplication" ToRole="Employee" />
+          <NavigationProperty Name="LeaveApplicationDetails" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_LeaveApplication" FromRole="LeaveApplication" ToRole="LeaveApplicationDetail" />
+          <NavigationProperty Name="LeaveApplicationSubmissions" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationSubmission_LeaveApplication" FromRole="LeaveApplication" ToRole="LeaveApplicationSubmission" />
+          <NavigationProperty Name="LeaveApplicationAttachments1" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationAttachment_LeaveApplication1" FromRole="LeaveApplication" ToRole="LeaveApplicationAttachment1" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationDetail">
+          <Key>
+            <PropertyRef Name="LeaveApplicationDetailID" />
+          </Key>
+          <Property Name="LeaveApplicationDetailID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LeaveApplicationID" Type="Int32" />
+          <Property Name="TypeOfLeaveID" Type="Byte" />
+          <Property Name="WithinThePhilippines" Type="Boolean" />
+          <Property Name="WithinThePhilippinesAbroadLocation" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="InHospital" Type="Boolean" />
+          <Property Name="InHospitalOutPatientIllness" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="SpecialLeaveBenefits" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="CompletionOfMastersDegree" Type="Boolean" />
+          <Property Name="BARBoardExaminationReview" Type="Boolean" />
+          <Property Name="MonetizationOfLeaveCredits" Type="Boolean" />
+          <Property Name="TerminalLeave" Type="Boolean" />
+          <NavigationProperty Name="LeaveApplication" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_LeaveApplication" FromRole="LeaveApplicationDetail" ToRole="LeaveApplication" />
+          <NavigationProperty Name="TypeOfLeave" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_TypeOfLeave" FromRole="LeaveApplicationDetail" ToRole="TypeOfLeave" />
+          <NavigationProperty Name="LeaveApplicationDetailInclusiveDates" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail" FromRole="LeaveApplicationDetail" ToRole="LeaveApplicationDetailInclusiveDate" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationDetailInclusiveDate">
+          <Key>
+            <PropertyRef Name="LeaveApplicationDetailInclusiveDateID" />
+          </Key>
+          <Property Name="LeaveApplicationDetailInclusiveDateID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LeaveApplicationDetailID" Type="Int32" />
+          <Property Name="LeaveDate" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="LeaveApplicationDetail" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail" FromRole="LeaveApplicationDetailInclusiveDate" ToRole="LeaveApplicationDetail" />
+        </EntityType>
+        <EntityType Name="Office">
+          <Key>
+            <PropertyRef Name="OfficeID" />
+          </Key>
+          <Property Name="OfficeID" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="OfficeName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Abbr" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Description" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Employees" Relationship="OnlineLeaveApplicationModel.FK_Employee_Office" FromRole="Office" ToRole="Employee" />
+          <Property Name="MainOfficeID" Type="Byte" />
+          <NavigationProperty Name="MainOffice" Relationship="OnlineLeaveApplicationModel.FK_Office_MainOffice" FromRole="Office" ToRole="MainOffice1" />
+        </EntityType>
+        <EntityType Name="Position">
+          <Key>
+            <PropertyRef Name="PositionID" />
+          </Key>
+          <Property Name="PositionID" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PositionName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Abbr" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Employees" Relationship="OnlineLeaveApplicationModel.FK_Employee_Position" FromRole="Position" ToRole="Employee" />
+        </EntityType>
+        <EntityType Name="RegionalOrder">
+          <Key>
+            <PropertyRef Name="RegionalOrderID" />
+          </Key>
+          <Property Name="RegionalOrderID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RegionalOrderNumber" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="Title" Type="String" MaxLength="350" FixedLength="false" Unicode="false" />
+          <Property Name="RegionalOrderDate" Type="DateTime" Precision="0" />
+          <Property Name="Signatory" Type="Int16" />
+          <Property Name="isCompensatoryOvertimeCredit" Type="Boolean" />
+          <Property Name="Remarks" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="UploadedFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="Employee" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrder_RegionalOrder" FromRole="RegionalOrder" ToRole="Employee" />
+          <NavigationProperty Name="RegionalOrderDetails" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_RegionalOrder" FromRole="RegionalOrder" ToRole="RegionalOrderDetail" />
+          <Property Name="FilePath" Type="String" MaxLength="260" FixedLength="false" Unicode="true" />
+          <Property Name="OriginalFileName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="RegionalOrderDetail">
+          <Key>
+            <PropertyRef Name="RegionalOrderDetailID" />
+          </Key>
+          <Property Name="RegionalOrderDetailID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RegionalOrderID" Type="Int32" />
+          <Property Name="EmployeeID" Type="Int16" />
+          <Property Name="Venue" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+          <Property Name="Remarks" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Employee" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_Employee" FromRole="RegionalOrderDetail" ToRole="Employee" />
+          <NavigationProperty Name="RegionalOrder" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetail_RegionalOrder" FromRole="RegionalOrderDetail" ToRole="RegionalOrder" />
+          <NavigationProperty Name="RegionalOrderDetailDates" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetailDate_RegionalOrderDetail" FromRole="RegionalOrderDetail" ToRole="RegionalOrderDetailDate" />
+        </EntityType>
+        <EntityType Name="RegionalOrderDetailDate">
+          <Key>
+            <PropertyRef Name="RegionalOrderDetailDateID" />
+          </Key>
+          <Property Name="RegionalOrderDetailDateID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RegionalOrderDetailID" Type="Int32" />
+          <Property Name="ActivityDate" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="RegionalOrderDetail" Relationship="OnlineLeaveApplicationModel.FK_RegionalOrderDetailDate_RegionalOrderDetail" FromRole="RegionalOrderDetailDate" ToRole="RegionalOrderDetail" />
+        </EntityType>
+        <EntityType Name="TypeOfLeave">
+          <Key>
+            <PropertyRef Name="TypeOfLeaveID" />
+          </Key>
+          <Property Name="TypeOfLeaveID" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TypeOfLeave1" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="LegalBasis" Type="String" MaxLength="300" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LeaveApplicationDetails" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationDetail_TypeOfLeave" FromRole="TypeOfLeave" ToRole="LeaveApplicationDetail" />
+        </EntityType>
+        <Association Name="FK_Employee_Office">
+          <End Type="OnlineLeaveApplicationModel.Office" Role="Office" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Office">
+              <PropertyRef Name="OfficeID" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="OfficeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Employee_Position">
+          <End Type="OnlineLeaveApplicationModel.Position" Role="Position" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Position">
+              <PropertyRef Name="PositionID" />
+            </Principal>
+            <Dependent Role="Employee">
+              <PropertyRef Name="PositionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee1">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ApprovedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee2">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ReviewedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplication_Employee3">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="LeaveApplication">
+              <PropertyRef Name="ReceivedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrder_RegionalOrder">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.RegionalOrder" Role="RegionalOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="RegionalOrder">
+              <PropertyRef Name="Signatory" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetail_Employee">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.RegionalOrderDetail" Role="RegionalOrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetail">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetail_LeaveApplication">
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationDetail" Role="LeaveApplicationDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetail">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetail_TypeOfLeave">
+          <End Type="OnlineLeaveApplicationModel.TypeOfLeave" Role="TypeOfLeave" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationDetail" Role="LeaveApplicationDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TypeOfLeave">
+              <PropertyRef Name="TypeOfLeaveID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetail">
+              <PropertyRef Name="TypeOfLeaveID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationDetailInclusiveDate_LeaveApplicationDetail">
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationDetail" Role="LeaveApplicationDetail" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationDetailInclusiveDate" Role="LeaveApplicationDetailInclusiveDate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplicationDetail">
+              <PropertyRef Name="LeaveApplicationDetailID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationDetailInclusiveDate">
+              <PropertyRef Name="LeaveApplicationDetailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetail_RegionalOrder">
+          <End Type="OnlineLeaveApplicationModel.RegionalOrder" Role="RegionalOrder" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.RegionalOrderDetail" Role="RegionalOrderDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionalOrder">
+              <PropertyRef Name="RegionalOrderID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetail">
+              <PropertyRef Name="RegionalOrderID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_RegionalOrderDetailDate_RegionalOrderDetail">
+          <End Type="OnlineLeaveApplicationModel.RegionalOrderDetail" Role="RegionalOrderDetail" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.RegionalOrderDetailDate" Role="RegionalOrderDetailDate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionalOrderDetail">
+              <PropertyRef Name="RegionalOrderDetailID" />
+            </Principal>
+            <Dependent Role="RegionalOrderDetailDate">
+              <PropertyRef Name="RegionalOrderDetailID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="LeaveApplicationSubmission">
+          <Key>
+            <PropertyRef Name="LeaveApplicationSubmissionID" />
+          </Key>
+          <Property Name="LeaveApplicationSubmissionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LeaveApplicationID" Type="Int32" />
+          <Property Name="SubmittedBy" Type="Int16" />
+          <Property Name="DateSubmitted" Type="DateTime" Precision="3" />
+          <Property Name="ReceivedBy" Type="Int16" />
+          <Property Name="Status" Type="Int16" />
+          <NavigationProperty Name="LeaveApplication" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationSubmission_LeaveApplication" FromRole="LeaveApplicationSubmission" ToRole="LeaveApplication" />
+          <Property Name="Remarks" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_LeaveApplicationSubmission_LeaveApplication">
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationSubmission" Role="LeaveApplicationSubmission" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationSubmission">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="CTOApplication">
+          <Key>
+            <PropertyRef Name="CTOApplicationID" />
+          </Key>
+          <Property Name="CTOApplicationID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EmployeeID" Type="Int16" />
+          <Property Name="DateApplied" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="Employee" Relationship="OnlineLeaveApplicationModel.FK_CTOApplication_Employee" FromRole="CTOApplication1" ToRole="Employee" />
+        </EntityType>
+        <EntityType Name="LeaveApplicationAttachment">
+          <Key>
+            <PropertyRef Name="LeaveApplicationAttachmentID" />
+          </Key>
+          <Property Name="LeaveApplicationAttachmentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LeaveApplicationID" Type="Int32" />
+          <Property Name="UploadedFile" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="FileName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LeaveApplication" Relationship="OnlineLeaveApplicationModel.FK_LeaveApplicationAttachment_LeaveApplication1" FromRole="LeaveApplicationAttachment1" ToRole="LeaveApplication" />
+        </EntityType>
+        <EntityType Name="MainOffice">
+          <Key>
+            <PropertyRef Name="MainOfficeID" />
+          </Key>
+          <Property Name="MainOfficeID" Type="Byte" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MainOfficeName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ForInitialReview" Type="Int16" />
+          <Property Name="ForReview" Type="Int16" />
+          <Property Name="ForApproval" Type="Int16" />
+          <NavigationProperty Name="Employee" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_InitialReview1" FromRole="MainOffice1" ToRole="Employee" />
+          <NavigationProperty Name="Employee1" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_Review1" FromRole="MainOffice1" ToRole="Employee" />
+          <NavigationProperty Name="Employee2" Relationship="OnlineLeaveApplicationModel.FK_MainOffice_Signatory1" FromRole="MainOffice1" ToRole="Employee" />
+          <NavigationProperty Name="Offices" Relationship="OnlineLeaveApplicationModel.FK_Office_MainOffice" FromRole="MainOffice1" ToRole="Office" />
+        </EntityType>
+        <Association Name="FK_CTOApplication_Employee">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.CTOApplication" Role="CTOApplication1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="CTOApplication1">
+              <PropertyRef Name="EmployeeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_InitialReview1">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.MainOffice" Role="MainOffice1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice1">
+              <PropertyRef Name="ForInitialReview" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_Review1">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.MainOffice" Role="MainOffice1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice1">
+              <PropertyRef Name="ForReview" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_MainOffice_Signatory1">
+          <End Type="OnlineLeaveApplicationModel.Employee" Role="Employee" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.MainOffice" Role="MainOffice1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employee">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="MainOffice1">
+              <PropertyRef Name="ForApproval" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LeaveApplicationAttachment_LeaveApplication1">
+          <End Type="OnlineLeaveApplicationModel.LeaveApplication" Role="LeaveApplication" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.LeaveApplicationAttachment" Role="LeaveApplicationAttachment1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LeaveApplication">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Principal>
+            <Dependent Role="LeaveApplicationAttachment1">
+              <PropertyRef Name="LeaveApplicationID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Office_MainOffice">
+          <End Type="OnlineLeaveApplicationModel.MainOffice" Role="MainOffice1" Multiplicity="0..1" />
+          <End Type="OnlineLeaveApplicationModel.Office" Role="Office" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MainOffice1">
+              <PropertyRef Name="MainOfficeID" />
+            </Principal>
+            <Dependent Role="Office">
+              <PropertyRef Name="MainOfficeID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="OnlineLeaveApplicationModelStoreContainer" CdmEntityContainer="OnlineLeaveApplicationEntities">
+          <EntitySetMapping Name="Employees">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.Employee">
+              <MappingFragment StoreEntitySet="Employee">
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+                <ScalarProperty Name="PositionID" ColumnName="PositionID" />
+                <ScalarProperty Name="EmailAddress" ColumnName="EmailAddress" />
+                <ScalarProperty Name="ContactNumber" ColumnName="ContactNumber" />
+                <ScalarProperty Name="MiddleName" ColumnName="MiddleName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveApplications">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.LeaveApplication">
+              <MappingFragment StoreEntitySet="LeaveApplication">
+                <ScalarProperty Name="ApprovedBy" ColumnName="ApprovedBy" />
+                <ScalarProperty Name="ReviewedBy" ColumnName="ReviewedBy" />
+                <ScalarProperty Name="ReceivedBy" ColumnName="ReceivedBy" />
+                <ScalarProperty Name="DateApplied" ColumnName="DateApplied" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="LeaveApplicationID" ColumnName="LeaveApplicationID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveApplicationDetails">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.LeaveApplicationDetail">
+              <MappingFragment StoreEntitySet="LeaveApplicationDetail">
+                <ScalarProperty Name="TerminalLeave" ColumnName="TerminalLeave" />
+                <ScalarProperty Name="MonetizationOfLeaveCredits" ColumnName="MonetizationOfLeaveCredits" />
+                <ScalarProperty Name="BARBoardExaminationReview" ColumnName="BARBoardExaminationReview" />
+                <ScalarProperty Name="CompletionOfMastersDegree" ColumnName="CompletionOfMastersDegree" />
+                <ScalarProperty Name="SpecialLeaveBenefits" ColumnName="SpecialLeaveBenefits" />
+                <ScalarProperty Name="InHospitalOutPatientIllness" ColumnName="InHospitalOutPatientIllness" />
+                <ScalarProperty Name="InHospital" ColumnName="InHospital" />
+                <ScalarProperty Name="WithinThePhilippinesAbroadLocation" ColumnName="WithinThePhilippinesAbroadLocation" />
+                <ScalarProperty Name="WithinThePhilippines" ColumnName="WithinThePhilippines" />
+                <ScalarProperty Name="TypeOfLeaveID" ColumnName="TypeOfLeaveID" />
+                <ScalarProperty Name="LeaveApplicationID" ColumnName="LeaveApplicationID" />
+                <ScalarProperty Name="LeaveApplicationDetailID" ColumnName="LeaveApplicationDetailID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveApplicationDetailInclusiveDates">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.LeaveApplicationDetailInclusiveDate">
+              <MappingFragment StoreEntitySet="LeaveApplicationDetailInclusiveDate">
+                <ScalarProperty Name="LeaveDate" ColumnName="LeaveDate" />
+                <ScalarProperty Name="LeaveApplicationDetailID" ColumnName="LeaveApplicationDetailID" />
+                <ScalarProperty Name="LeaveApplicationDetailInclusiveDateID" ColumnName="LeaveApplicationDetailInclusiveDateID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Offices">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.Office">
+              <MappingFragment StoreEntitySet="Office">
+                <ScalarProperty Name="MainOfficeID" ColumnName="MainOfficeID" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Abbr" ColumnName="Abbr" />
+                <ScalarProperty Name="OfficeName" ColumnName="OfficeName" />
+                <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Positions">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.Position">
+              <MappingFragment StoreEntitySet="Position">
+                <ScalarProperty Name="Abbr" ColumnName="Abbr" />
+                <ScalarProperty Name="PositionName" ColumnName="PositionName" />
+                <ScalarProperty Name="PositionID" ColumnName="PositionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RegionalOrders">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.RegionalOrder">
+              <MappingFragment StoreEntitySet="RegionalOrder">
+                <ScalarProperty Name="OriginalFileName" ColumnName="OriginalFileName" />
+                <ScalarProperty Name="FilePath" ColumnName="FilePath" />
+                <ScalarProperty Name="UploadedFile" ColumnName="UploadedFile" />
+                <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="isCompensatoryOvertimeCredit" ColumnName="isCompensatoryOvertimeCredit" />
+                <ScalarProperty Name="Signatory" ColumnName="Signatory" />
+                <ScalarProperty Name="RegionalOrderDate" ColumnName="RegionalOrderDate" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="RegionalOrderNumber" ColumnName="RegionalOrderNumber" />
+                <ScalarProperty Name="RegionalOrderID" ColumnName="RegionalOrderID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RegionalOrderDetails">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.RegionalOrderDetail">
+              <MappingFragment StoreEntitySet="RegionalOrderDetail">
+                <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="Venue" ColumnName="Venue" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="RegionalOrderID" ColumnName="RegionalOrderID" />
+                <ScalarProperty Name="RegionalOrderDetailID" ColumnName="RegionalOrderDetailID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RegionalOrderDetailDates">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.RegionalOrderDetailDate">
+              <MappingFragment StoreEntitySet="RegionalOrderDetailDate">
+                <ScalarProperty Name="ActivityDate" ColumnName="ActivityDate" />
+                <ScalarProperty Name="RegionalOrderDetailID" ColumnName="RegionalOrderDetailID" />
+                <ScalarProperty Name="RegionalOrderDetailDateID" ColumnName="RegionalOrderDetailDateID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TypeOfLeaves">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.TypeOfLeave">
+              <MappingFragment StoreEntitySet="TypeOfLeave">
+                <ScalarProperty Name="LegalBasis" ColumnName="LegalBasis" />
+                <ScalarProperty Name="TypeOfLeave1" ColumnName="TypeOfLeave" />
+                <ScalarProperty Name="TypeOfLeaveID" ColumnName="TypeOfLeaveID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveApplicationSubmissions">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.LeaveApplicationSubmission">
+              <MappingFragment StoreEntitySet="LeaveApplicationSubmission">
+                <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ReceivedBy" ColumnName="ReceivedBy" />
+                <ScalarProperty Name="DateSubmitted" ColumnName="DateSubmitted" />
+                <ScalarProperty Name="SubmittedBy" ColumnName="SubmittedBy" />
+                <ScalarProperty Name="LeaveApplicationID" ColumnName="LeaveApplicationID" />
+                <ScalarProperty Name="LeaveApplicationSubmissionID" ColumnName="LeaveApplicationSubmissionID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CTOApplications">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.CTOApplication">
+              <MappingFragment StoreEntitySet="CTOApplication">
+                <ScalarProperty Name="DateApplied" ColumnName="DateApplied" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="CTOApplicationID" ColumnName="CTOApplicationID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LeaveApplicationAttachments">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.LeaveApplicationAttachment">
+              <MappingFragment StoreEntitySet="LeaveApplicationAttachment">
+                <ScalarProperty Name="FileName" ColumnName="FileName" />
+                <ScalarProperty Name="UploadedFile" ColumnName="UploadedFile" />
+                <ScalarProperty Name="LeaveApplicationID" ColumnName="LeaveApplicationID" />
+                <ScalarProperty Name="LeaveApplicationAttachmentID" ColumnName="LeaveApplicationAttachmentID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MainOffices">
+            <EntityTypeMapping TypeName="OnlineLeaveApplicationModel.MainOffice">
+              <MappingFragment StoreEntitySet="MainOffice">
+                <ScalarProperty Name="ForApproval" ColumnName="ForApproval" />
+                <ScalarProperty Name="ForReview" ColumnName="ForReview" />
+                <ScalarProperty Name="ForInitialReview" ColumnName="ForInitialReview" />
+                <ScalarProperty Name="MainOfficeName" ColumnName="MainOfficeName" />
+                <ScalarProperty Name="MainOfficeID" ColumnName="MainOfficeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
