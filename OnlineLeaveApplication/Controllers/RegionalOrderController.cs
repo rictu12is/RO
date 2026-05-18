@@ -75,6 +75,8 @@ namespace OnlineLeaveApplication.Controllers
                 storedFile.OriginalFileName,
                 regionalOrder.RegionalOrderID);
 
+            TryCreateRegionalOrderAssignmentNotifications(regionalOrder);
+
             return Json("Successfully saved the leave application record!", JsonRequestBehavior.AllowGet);
         }
 
@@ -130,6 +132,80 @@ namespace OnlineLeaveApplication.Controllers
             }
 
             return "Validation failed: " + string.Join("; ", messages);
+        }
+
+        void TryCreateRegionalOrderAssignmentNotifications(RegionalOrder regionalOrder)
+        {
+            try
+            {
+                if (!NotificationStore.TryEnsureNotificationTableExists(db))
+                {
+                    return;
+                }
+
+                if (regionalOrder == null || regionalOrder.RegionalOrderDetails == null)
+                {
+                    return;
+                }
+
+                var employeeIDs = regionalOrder.RegionalOrderDetails
+                    .Where(detail => detail.EmployeeID.HasValue)
+                    .Select(detail => detail.EmployeeID.Value)
+                    .Distinct()
+                    .ToList();
+
+                if (!employeeIDs.Any())
+                {
+                    return;
+                }
+
+                var createdByEmployeeID = GetCurrentEmployeeID();
+                var regionalOrderLabel = string.Join(" - ", new[]
+                    {
+                        regionalOrder.RegionalOrderNumber,
+                        regionalOrder.Title
+                    }
+                    .Where(value => !string.IsNullOrWhiteSpace(value)));
+
+                if (string.IsNullOrWhiteSpace(regionalOrderLabel))
+                {
+                    regionalOrderLabel = "Regional Order";
+                }
+
+                var title = Truncate("New Regional Order Assignment", 160);
+                var message = Truncate("You were assigned to " + regionalOrderLabel + ".", 500);
+                var targetUrl = Url.Action("DisplayFile", "RegionalOrder", new { id = regionalOrder.RegionalOrderID });
+
+                foreach (var employeeID in employeeIDs)
+                {
+                    db.Database.ExecuteSqlCommand(
+                        @"INSERT INTO dbo.Notification
+                            (EmployeeID, RegionalOrderID, NotificationType, Title, Message, TargetUrl, CreatedByEmployeeID)
+                        VALUES
+                            (@p0, @p1, @p2, @p3, @p4, @p5, @p6)",
+                        employeeID,
+                        regionalOrder.RegionalOrderID,
+                        "RegionalOrderAssigned",
+                        title,
+                        message,
+                        targetUrl,
+                        createdByEmployeeID);
+                }
+            }
+            catch (Exception)
+            {
+                // Notifications should not block Regional Order creation.
+            }
+        }
+
+        string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength)
+            {
+                return value;
+            }
+
+            return value.Substring(0, maxLength);
         }
 
         public ActionResult GetRegionalOrders()

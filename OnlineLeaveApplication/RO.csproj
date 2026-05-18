@@ -215,6 +215,7 @@
     <Compile Include="Controllers\AttendanceServiceController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LeaveApplicationController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\RegionalOrderController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="CTOApplication.cs">
@@ -244,6 +245,7 @@
     <Compile Include="MainOffice.cs">
       <DependentUpon>OnlineLeaveApplication.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\NotificationStore.cs" />
     <Compile Include="Models\SDKHelper.cs" />
     <Compile Include="Office.cs">
       <DependentUpon>OnlineLeaveApplication.tt</DependentUpon>
@@ -291,6 +293,7 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Database\dbo.Notification.sql" />
     <Content Include="dist\css\adminlte.css" />
     <Content Include="dist\css\adminlte.min.css" />
     <Content Include="dist\css\alt\adminlte.components.css" />

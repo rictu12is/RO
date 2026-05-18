@@ -35,27 +35,36 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="~/plugins/fullcalendar-timegrid/main.min.css">
     <link rel="stylesheet" href="~/plugins/fullcalendar-bootstrap/main.min.css">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition layout-top-nav">
     <div class="wrapper">
+        @{
+            var employeeName = Convert.ToString(Session["EmployeeName"]);
+            if (string.IsNullOrWhiteSpace(employeeName))
+            {
+                employeeName = "Regional Order User";
+            }
+        }
 
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <a href="@Url.Action("RegionalOrders", "Home")" class="ro-navbar-brand">
+                <img src="~/dist/img/DILG LOGO.png" class="ro-navbar-logo" alt="DILG Logo">
+                <span class="ro-navbar-title">REGIONAL ORDER MANAGEMENT SYSTEM XII</span>
+            </a>
+
             <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
+            <ul class="navbar-nav ro-primary-nav">
+                <li class="nav-item ro-primary-nav-item">
                     <a href="@Url.Action("RegionalOrders", "Home")" class="nav-link">Regional Orders</a>
                 </li>
                 @{ if (Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4)
                                 {
-                    <li class="nav-item d-none d-sm-inline-block">
-                        <a href="@Url.Action("RegionalOrders", "Home")" class="nav-link">Admin Dashboard</a>
+                    <li class="nav-item ro-primary-nav-item">
+                        <a href="@Url.Action("ManageRegionalOrder", "Home")" class="nav-link">Manage Regional Orders</a>
                     </li>
  }
                 }
-                <li class="nav-item d-none d-sm-inline-block">
+                <li class="nav-item ro-primary-nav-item">
                     <a href="@Url.Action("RegionalOrderCalendar", "Home")" class="nav-link">Calendar</a>
                 </li>
             </ul>
@@ -73,222 +82,45 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </form>
 
             <!-- Right navbar links -->
-            <!--<ul class="navbar-nav ml-auto">-->
-                <!-- Messages Dropdown Menu -->
-                <!--<li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
-                        <i class="far fa-comments"></i>
-                        <span class="badge badge-danger navbar-badge">3</span>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <a href="#" class="dropdown-item">-->
-                            <!-- Message Start -->
-                            <!--<div class="media">
-                                <img src="~/dist/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-                                <div class="media-body">
-                                    <h3 class="dropdown-item-title">
-                                        Brad Diesel
-                                        <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                                    </h3>
-                                    <p class="text-sm">Call me whenever you can...</p>
-                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                </div>
-                            </div>-->
-                            <!-- Message End -->
-                        <!--</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">-->
-                            <!-- Message Start -->
-                            <!--<div class="media">
-                                <img src="~/dist/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                                <div class="media-body">
-                                    <h3 class="dropdown-item-title">
-                                        John Pierce
-                                        <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                                    </h3>
-                                    <p class="text-sm">I got your message bro</p>
-                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                </div>
-                            </div>-->
-                            <!-- Message End -->
-                        <!--</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">-->
-                            <!-- Message Start -->
-                            <!--<div class="media">
-                                <img src="~/dist/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
-                                <div class="media-body">
-                                    <h3 class="dropdown-item-title">
-                                        Nora Silvester
-                                        <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                                    </h3>
-                                    <p class="text-sm">The subject goes here</p>
-                                    <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-                                </div>
-                            </div>-->
-                            <!-- Message End -->
-                        <!--</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-                    </div>
-                </li>-->
-                <!-- Notifications Dropdown Menu -->
-                <!--<li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown ro-notification-menu">
+                    <a class="nav-link ro-notification-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" title="Notifications">
                         <i class="far fa-bell"></i>
-                        <span class="badge badge-warning navbar-badge">15</span>
+                        <span class="badge badge-danger navbar-badge ro-notification-badge" id="ro-notification-count"></span>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                        <span class="dropdown-header">15 Notifications</span>
+                    <div class="dropdown-menu dropdown-menu-right ro-notification-dropdown">
+                        <div class="ro-notification-header">
+                            <span>Notifications</span>
+                            <button type="button" class="btn btn-link btn-sm" id="ro-notification-mark-all">Mark all read</button>
+                        </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-envelope mr-2"></i> 4 new messages
-                            <span class="float-right text-muted text-sm">3 mins</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-users mr-2"></i> 8 friend requests
-                            <span class="float-right text-muted text-sm">12 hours</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-file mr-2"></i> 3 new reports
-                            <span class="float-right text-muted text-sm">2 days</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+                        <div id="ro-notification-list">
+                            <span class="dropdown-item ro-notification-empty">No notifications yet.</span>
+                        </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#">
-                        <i class="fas fa-th-large"></i>
+                <li class="nav-item dropdown ro-profile-menu">
+                    <a class="nav-link ro-profile-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <img src="~/dist/img/default-150x150.png" class="ro-profile-avatar" alt="User Image">
+                        <span class="ro-profile-name">@employeeName</span>
+                        <i class="fas fa-angle-down ro-profile-caret"></i>
                     </a>
+                    <div class="dropdown-menu dropdown-menu-right ro-profile-dropdown">
+                        <span class="dropdown-item disabled">
+                            <i class="fas fa-user mr-2"></i> Account
+                        </span>
+                        <span class="dropdown-item disabled">
+                            <i class="fas fa-cog mr-2"></i> Settings
+                        </span>
+                        <div class="dropdown-divider"></div>
+                        <a href="@Url.Action("Logout", "Home")" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
                 </li>
-            </ul>-->
+            </ul>
         </nav>
         <!-- /.navbar -->
-        <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
-            <a href="@Url.Action("RegionalOrders", "Home")" class="brand-link">
-                <img src="~/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-                     style="opacity: .8">
-                <span class="brand-text font-weight-light">RO Manager</span>
-            </a>
-
-            <!-- Sidebar -->
-            <div class="sidebar ro-sidebar-layout">
-                @{
-                    var employeeName = Convert.ToString(Session["EmployeeName"]);
-                    if (string.IsNullOrWhiteSpace(employeeName))
-                    {
-                        employeeName = "Regional Order User";
-                    }
-                }
-                <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="~/dist/img/default-150x150.png" class="img-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block">@employeeName</a>
-                    </div>
-                </div>
-
-                <!-- Sidebar Menu -->
-                <nav class="mt-2 ro-sidebar-nav">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                        <!-- Add icons to the links using the .nav-icon class
-                        with font-awesome or any other icon font library -->
-                        <li class="nav-item has-treeview menu-open d-none">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-file-signature"></i>
-                                <p>
-                                    Leave Application
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="/Home/Dashboard" class="nav-link">
-                                        <p>Dashboard</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Home/Index" class="nav-link">
-                                        <p>Apply for Leave</p>
-                                    </a>
-                                </li>
-                                @{ if (Convert.ToInt32(Session["Status"]) != 0)
-                                                {
-                                    <li class="nav-item">
-                                        <a href="/Home/ListofApplications" class="nav-link">
-                                            <p>List of Applications</p>
-                                        </a>
-                                    </li>
- }
-                                }
-                                <li class="nav-item">
-                                    <a href="/Home/ListofApplications" class="nav-link">
-                                        <p>Holidays</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/Home/Signatories" class="nav-link">
-                                        <p>Manage Signatories</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item has-treeview menu-open">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fas fa-file-signature"></i>
-                                <p>
-                                    Regional Orders
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                @{ if (Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4)
-                                                {
-                                    <li class="nav-item">
-                                        <a href="~/Home/ManageRegionalOrder" class="nav-link"> 
-                                            <p>Manage Regional Orders</p>
-                                        </a>
-                                    </li>
- }
-                                }
-                                <li class="nav-item">
-                                    <a href="~/Home/RegionalOrders" class="nav-link"> 
-                                        <p>My Regional Orders</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="~/Home/RegionalOrderCalendar" class="nav-link">
-                                        <p>Regional Order Calendar</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item d-none">
-                                    <a href="~/Home/CTOApplication" class="nav-link"> 
-                                        <p>Apply for CTO</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                </nav>
-                <!-- /.sidebar-menu -->
-                <div class="ro-sidebar-logout">
-                    <a href="@Url.Action("Logout", "Home")" class="nav-link" title="Logout">
-                        <i class="nav-icon fas fa-sign-out-alt"></i>
-                        <p>Logout</p>
-                    </a>
-                </div>
-            </div>
-            <!-- /.sidebar -->
-        </aside>
-
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -326,15 +158,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-        <!-- Control Sidebar -->
-        <aside class="control-sidebar control-sidebar-dark">
-            <!-- Control sidebar content goes here -->
-            <div class="p-3">
-                <h5>Title</h5>
-                <p>Sidebar content</p>
-            </div>
-        </aside>
-        <!-- /.control-sidebar -->
         <!-- Main Footer -->
         <footer class="main-footer">
             <!-- To the right -->
@@ -373,5 +196,90 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src="~/plugins/fullcalendar-timegrid/main.min.js"></script>
     <script src="~/plugins/fullcalendar-interaction/main.min.js"></script>
     <script src="~/plugins/fullcalendar-bootstrap/main.min.js"></script>
+    <script>
+        (function () {
+            var notificationList = $('#ro-notification-list');
+            var notificationCount = $('#ro-notification-count');
+            var markAllButton = $('#ro-notification-mark-all');
+
+            function htmlEncode(value) {
+                return $('<div/>').text(value || '').html();
+            }
+
+            function updateUnreadCount(count) {
+                var unreadCount = parseInt(count || 0, 10);
+                if (unreadCount > 0) {
+                    notificationCount.text(unreadCount > 99 ? '99+' : unreadCount).show();
+                    markAllButton.prop('disabled', false);
+                } else {
+                    notificationCount.text('').hide();
+                    markAllButton.prop('disabled', true);
+                }
+            }
+
+            function renderNotifications(data) {
+                var notifications = data && data.notifications ? data.notifications : [];
+                updateUnreadCount(data ? data.unreadCount : 0);
+                notificationList.empty();
+
+                if (data && data.errorMessage) {
+                    notificationList.append('<span class="dropdown-item ro-notification-empty">' + htmlEncode(data.errorMessage) + '</span>');
+                    return;
+                }
+
+                if (!notifications.length) {
+                    notificationList.append('<span class="dropdown-item ro-notification-empty">No notifications yet.</span>');
+                    return;
+                }
+
+                notifications.forEach(function (notification) {
+                    var readClass = notification.isRead ? ' is-read' : '';
+                    var item = '' +
+                        '<a href="#" class="dropdown-item ro-notification-item' + readClass + '" data-id="' + notification.NotificationID + '" data-url="' + htmlEncode(notification.TargetUrl || '@Url.Action("RegionalOrders", "Home")') + '">' +
+                            '<span class="ro-notification-dot"></span>' +
+                            '<span class="ro-notification-copy">' +
+                                '<strong>' + htmlEncode(notification.Title) + '</strong>' +
+                                '<span>' + htmlEncode(notification.Message) + '</span>' +
+                                '<small>' + htmlEncode(notification.createdAt) + '</small>' +
+                            '</span>' +
+                        '</a>';
+                    notificationList.append(item);
+                });
+            }
+
+            function loadNotifications() {
+                $.getJSON('@Url.Action("GetMyNotifications", "Notification")')
+                    .done(renderNotifications)
+                    .fail(function () {
+                        updateUnreadCount(0);
+                    });
+            }
+
+            notificationList.on('click', '.ro-notification-item', function (event) {
+                event.preventDefault();
+                var item = $(this);
+                var targetUrl = item.data('url') || '@Url.Action("RegionalOrders", "Home")';
+
+                $.post('@Url.Action("MarkNotificationRead", "Notification")', { id: item.data('id') })
+                    .always(function () {
+                        window.location.href = targetUrl;
+                    });
+            });
+
+            markAllButton.on('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                $.post('@Url.Action("MarkAllNotificationsRead", "Notification")')
+                    .done(function (data) {
+                        updateUnreadCount(data ? data.unreadCount : 0);
+                        notificationList.find('.ro-notification-item').addClass('is-read');
+                    });
+            });
+
+            loadNotifications();
+            window.setInterval(loadNotifications, 60000);
+        })();
+    </script>
 </body>
 </html>

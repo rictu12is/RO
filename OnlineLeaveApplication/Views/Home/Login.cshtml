@@ -59,6 +59,14 @@
             box-shadow: 0 18px 45px rgba(31, 35, 41, 0.08);
         }
 
+        .login-logo {
+            display: block;
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 20px;
+            object-fit: contain;
+        }
+
         .system-name {
             margin: 0 0 10px;
             color: var(--text-main);
@@ -164,6 +172,12 @@
                 padding: 28px 22px;
             }
 
+            .login-logo {
+                width: 104px;
+                height: 104px;
+                margin-bottom: 18px;
+            }
+
             .system-name {
                 font-size: 1.38rem;
             }
@@ -173,6 +187,7 @@
 <body class="hold-transition login-page">
     <main class="login-shell" aria-labelledby="login-title">
         <section class="login-panel">
+            <img src="~/dist/img/DILG LOGO.png" class="login-logo" alt="DILG Logo">
             <h1 class="system-name" id="login-title">DILG Online Leave Administration System</h1>
             <p class="login-copy">Sign in with your account credentials.</p>
 
