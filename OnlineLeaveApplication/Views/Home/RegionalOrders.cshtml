@@ -1,83 +1,423 @@
-﻿
 @{
-    ViewBag.Title = "My Regional Orders";
+    var isRegionalOrderAdmin = Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4;
+    ViewBag.Title = isRegionalOrderAdmin ? "Admin Dashboard / Statistics" : "My Regional Orders";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="ro-page-header">
-    <div>
-        <h1 class="ro-page-title">My Regional Orders</h1>
-        <p class="ro-page-subtitle">Track issued regional orders, participants, venues, and attached PDF files.</p>
-    </div>
-    <div class="ro-page-actions">
-        <a class="btn ro-btn ro-btn-primary" href="@Url.Action("RegionalOrderCalendar", "Home")">
-            <i class="fas fa-calendar-alt"></i> Calendar View
-        </a>
-    </div>
-</div>
-
-<section class="ro-card">
-    <div class="ro-card-header">
+@if (isRegionalOrderAdmin)
+{
+    <div class="ro-page-header">
         <div>
-            <h2 class="ro-card-title">Regional Order Records</h2>
-            <p class="ro-card-subtitle">Search and open your assigned regional order documents.</p>
+            <p class="ro-page-kicker">Regional Orders</p>
+            <h1 class="ro-page-title">Admin Dashboard / Statistics</h1>
+            <p class="ro-page-subtitle">Monitor regional order activity, participants, date ranges, and attached PDFs.</p>
+        </div>
+        <div class="ro-page-actions">
+            <button type="button" id="btn-toggle-ro-dashboard-filters" class="btn ro-btn btn-outline-secondary">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <a class="btn ro-btn btn-outline-secondary" href="@Url.Action("RegionalOrderCalendar", "Home")">
+                <i class="fas fa-calendar-alt"></i> Calendar View
+            </a>
+            <a class="btn ro-btn ro-btn-primary" href="@Url.Action("ManageRegionalOrder", "Home")">
+                <i class="fas fa-plus"></i> New Regional Order
+            </a>
         </div>
     </div>
-    <div class="ro-card-body">
-        <div class="table-responsive">
-            <table id="table_regional_orders" class="table table-bordered table-hover ro-admin-table">
+
+    <div class="row ro-stat-grid">
+        <div class="col-md-4">
+            <section class="ro-stat-card is-primary">
+                <div class="ro-stat-icon"><i class="fas fa-file-signature"></i></div>
+                <div>
+                    <p>Total Regional Orders</p>
+                    <h3 id="stat-total-regional-orders">0</h3>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-4">
+            <section class="ro-stat-card is-info">
+                <div class="ro-stat-icon"><i class="fas fa-users"></i></div>
+                <div>
+                    <p>Active Participants Today</p>
+                    <h3 id="stat-active-participants">0</h3>
+                </div>
+            </section>
+        </div>
+        <div class="col-md-4">
+            <section class="ro-stat-card is-warning">
+                <div class="ro-stat-icon"><i class="fas fa-calendar-plus"></i></div>
+                <div>
+                    <p>Upcoming Regional Orders</p>
+                    <h3 id="stat-upcoming-regional-orders">0</h3>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <section class="ro-dashboard-filter is-hidden">
+        <div class="form-group">
+            <label for="filter-ro-number">RO Number</label>
+            <input type="text" id="filter-ro-number" class="form-control" placeholder="Search RO number" />
+        </div>
+        <div class="form-group">
+            <label for="filter-status">Status</label>
+            <select id="filter-status" class="form-control">
+                <option value="">All Statuses</option>
+                <option value="Done">Done</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Upcoming">Upcoming</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="filter-participant">Participants</label>
+            <input type="text" id="filter-participant" class="form-control" placeholder="Search participant" />
+        </div>
+        <div class="form-group">
+            <label for="filter-date-start">Date From</label>
+            <input type="date" id="filter-date-start" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="filter-date-end">Date To</label>
+            <input type="date" id="filter-date-end" class="form-control" />
+        </div>
+        <div class="form-group ro-dashboard-filter-actions">
+            <button type="button" id="btn-apply-ro-dashboard-filters" class="btn ro-btn ro-btn-primary">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+        </div>
+    </section>
+
+    <section class="ro-monitor-card">
+        <div class="ro-monitor-header">
+            <div>
+                <h2><i class="fas fa-list-alt"></i> Regional Order Monitor</h2>
+                <p>Regional order date, activity range, status, and document actions.</p>
+            </div>
+            <div class="ro-monitor-tools">
+                <span id="ro-dashboard-record-count">0 Records Found</span>
+                <button type="button" id="btn-refresh-ro-dashboard" title="Refresh monitor">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive ro-monitor-table-wrap">
+            <table id="table_ro_dashboard" class="table table-hover ro-monitor-table">
                 <thead>
                     <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
+                        <th>RO Number</th>
+                        <th>Destination</th>
+                        <th>Participants</th>
+                        <th>Regional Order Date / Range</th>
+                        <th>Status</th>
+                        <th class="text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-    </div>
-</section>
+    </section>
 
-<script>
-    $(function () {
-        var table_regional_orders = $('#table_regional_orders').DataTable({
-            processing: true,      // Show loading indicator
-            serverSide: true,      // Enable server-side processing
-            autoWidth: false,      // Disable automatic column width calculation
-            lengthChange: false,
-            searching: true,
-            info: true,
-            pageLength: 5, 
-            ajax: {
-                "url": "/RegionalOrder/GetMyRegionalOrders", // URL for server-side processing
-                "type": "POST"
-            },
-            columns: [
-                {
-                    data: "RegionalOrderNumber", title: 'Regional Order No.',
-                    render: function (data, type, row, meta) {
-                        //`<a href="/Home/DisplayFile?id=" title="${res[2]}" target="_blank"><i class="fas fa-file-pdf"></i></a>`
-                        // fas fa-print
-                        var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
-                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong></a>`; // Example: Make text bold
+    <div class="modal fade" id="modal_ro_dashboard_details" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Regional Order Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">RO Number</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-number"></dd>
+
+                        <dt class="col-sm-3">Title</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-title"></dd>
+
+                        <dt class="col-sm-3">Date Issued</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-date"></dd>
+
+                        <dt class="col-sm-3">Activity Range</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-range"></dd>
+
+                        <dt class="col-sm-3">Status</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-status"></dd>
+
+                        <dt class="col-sm-3">Venue</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-venue"></dd>
+
+                        <dt class="col-sm-3">Participants</dt>
+                        <dd class="col-sm-9">
+                            <ul class="mb-0 pl-3" id="dashboard-detail-participants"></ul>
+                        </dd>
+
+                        <dt class="col-sm-3">Remarks</dt>
+                        <dd class="col-sm-9" id="dashboard-detail-remarks"></dd>
+
+                        <dt class="col-sm-3">Attached PDF</dt>
+                        <dd class="col-sm-9">
+                            <a id="dashboard-detail-pdf" href="#" target="_blank" title="Open attached PDF">
+                                <i class="fas fa-file-pdf fa-lg text-danger"></i>
+                            </a>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <a id="dashboard-detail-print" class="btn ro-btn ro-btn-primary" href="#" target="_blank">
+                        <i class="fas fa-print"></i> Print RO PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            function textOrEmpty(value, emptyText) {
+                return value || emptyText || 'N/A';
+            }
+
+            function htmlEncode(value) {
+                return $('<div />').text(value || '').html();
+            }
+
+            function updateStats(stats) {
+                stats = stats || {};
+                $('#stat-total-regional-orders').text(stats.totalRegionalOrders || 0);
+                $('#stat-active-participants').text(stats.activeParticipantsToday || 0);
+                $('#stat-upcoming-regional-orders').text(stats.upcomingRegionalOrders || 0);
+            }
+
+            function getStatusBadge(row) {
+                return '<span class="ro-status-badge is-' + row.StatusKey + '">' +
+                    '<span></span>' + htmlEncode(row.Status) + '</span>';
+            }
+
+            function renderParticipantList(selector, participants) {
+                var list = $(selector);
+                list.empty();
+
+                if (!participants || participants.length === 0) {
+                    list.append($('<li />').text('No participants'));
+                    return;
+                }
+
+                participants.forEach(function (participant) {
+                    list.append($('<li />').text(participant));
+                });
+            }
+
+            function showRegionalOrder(row) {
+                $('#dashboard-detail-number').text(textOrEmpty(row.RegionalOrderNumber));
+                $('#dashboard-detail-title').text(textOrEmpty(row.Title));
+                $('#dashboard-detail-date').text(textOrEmpty(row.RegionalOrderDate, 'No RO date'));
+                $('#dashboard-detail-range').text(textOrEmpty(row.ActivityDateRange, 'No activity range'));
+                $('#dashboard-detail-status').html(getStatusBadge(row));
+                $('#dashboard-detail-venue').text(textOrEmpty(row.Venue));
+                $('#dashboard-detail-remarks').text(textOrEmpty(row.Remarks));
+                $('#dashboard-detail-pdf').attr('href', row.PdfUrl || '#');
+                $('#dashboard-detail-print').attr('href', row.PdfUrl || '#');
+                renderParticipantList('#dashboard-detail-participants', row.ParticipantList);
+                $('#modal_ro_dashboard_details').modal('show');
+            }
+
+            var dashboardTable = $('#table_ro_dashboard').DataTable({
+                processing: true,
+                serverSide: true,
+                autoWidth: false,
+                lengthChange: false,
+                searching: false,
+                info: true,
+                pageLength: 5,
+                ajax: {
+                    url: '/RegionalOrder/GetRegionalOrderDashboard',
+                    type: 'POST',
+                    data: function (data) {
+                        data.roNumber = $('#filter-ro-number').val();
+                        data.status = $('#filter-status').val();
+                        data.participant = $('#filter-participant').val();
+                        data.dateStart = $('#filter-date-start').val();
+                        data.dateEnd = $('#filter-date-end').val();
+                    },
+                    dataSrc: function (json) {
+                        updateStats(json.stats);
+                        $('#ro-dashboard-record-count').text((json.recordsFiltered || 0) + ' Records Found');
+                        return json.data || [];
                     }
                 },
-                {
-                    title: 'Title/ Date Issued',
-                    render: function (data, type, row, meta) {
-                        return row.Title + '<br><b>' + row.RegionalOrderDate + '' +
-                            ` | Participants:</b> <a href="#" onclick="getData('` + row.DILGPersonnel + `','` + row.RegionalOrderNumber + `');" data-toggle="modal" data-target="#modal_list_personnel"><i class="fas fa-users"></i></a>`
+                columns: [
+                    {
+                        data: 'RegionalOrderNumber',
+                        title: 'RO Number',
+                        render: function (data, type, row) {
+                            return '<button type="button" class="btn btn-link p-0 ro-number-link js-view-ro">' +
+                                '<strong>' + htmlEncode(textOrEmpty(data, 'Regional Order')) + '</strong></button>' +
+                                '<div class="small text-muted">' + htmlEncode(textOrEmpty(row.Title, 'No title')) + '</div>';
+                        }
+                    },
+                    {
+                        data: 'Venue',
+                        title: 'Destination',
+                        render: function (data) {
+                            return '<div class="font-weight-bold">' + htmlEncode(textOrEmpty(data, 'No destination')) + '</div>';
+                        }
+                    },
+                    {
+                        data: 'Participants',
+                        title: 'Participants',
+                        render: function (data) {
+                            return '<div class="small text-muted">' + htmlEncode(textOrEmpty(data, 'No participants')) + '</div>';
+                        }
+                    },
+                    {
+                        data: 'DateDisplay',
+                        title: 'Regional Order Date / Range',
+                        render: function (data) {
+                            return '<span class="ro-date-display">' + htmlEncode(textOrEmpty(data, 'No date')) + '</span>';
+                        }
+                    },
+                    {
+                        data: 'Status',
+                        title: 'Status',
+                        render: function (data, type, row) {
+                            return getStatusBadge(row);
+                        }
+                    },
+                    {
+                        data: null,
+                        title: 'Actions',
+                        className: 'text-right',
+                        orderable: false,
+                        render: function () {
+                            return '<div class="dropdown ro-action-dropdown">' +
+                                '<button class="btn btn-sm btn-link" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Actions">' +
+                                '<i class="fas fa-ellipsis-v"></i></button>' +
+                                '<div class="dropdown-menu dropdown-menu-right">' +
+                                '<button class="dropdown-item js-view-ro" type="button"><i class="fas fa-eye"></i> View RO</button>' +
+                                '<a class="dropdown-item js-print-ro" href="#" target="_blank"><i class="fas fa-print"></i> Print RO PDF</a>' +
+                                '</div></div>';
+                        }
                     }
-                },
-                {
-                    title: 'Venue/Pax',
-                    render: function (data, type, row, meta) {
-                        return row.Venue
-                    }
-                },
-            ], 
+                ]
+            });
+
+            $('#btn-apply-ro-dashboard-filters').on('click', function () {
+                dashboardTable.ajax.reload();
+            });
+
+            $('#btn-toggle-ro-dashboard-filters').on('click', function () {
+                $('.ro-dashboard-filter').toggleClass('is-hidden');
+                $(this).toggleClass('is-active');
+            });
+
+            $('#btn-refresh-ro-dashboard').on('click', function () {
+                dashboardTable.ajax.reload(null, false);
+            });
+
+            $('#filter-ro-number, #filter-participant').on('keypress', function (event) {
+                if (event.which === 13) {
+                    dashboardTable.ajax.reload();
+                }
+            });
+
+            $('#table_ro_dashboard tbody').on('click', '.js-view-ro', function () {
+                var row = dashboardTable.row($(this).closest('tr')).data();
+                if (row) {
+                    showRegionalOrder(row);
+                }
+            });
+
+            $('#table_ro_dashboard tbody').on('click', '.js-print-ro', function () {
+                var row = dashboardTable.row($(this).closest('tr')).data();
+                if (row && row.PdfUrl) {
+                    $(this).attr('href', row.PdfUrl);
+                }
+            });
         });
-    });
-</script>
- 
+    </script>
+}
+else
+{
+    <div class="ro-page-header">
+        <div>
+            <h1 class="ro-page-title">My Regional Orders</h1>
+            <p class="ro-page-subtitle">Track issued regional orders, participants, venues, and attached PDF files.</p>
+        </div>
+        <div class="ro-page-actions">
+            <a class="btn ro-btn ro-btn-primary" href="@Url.Action("RegionalOrderCalendar", "Home")">
+                <i class="fas fa-calendar-alt"></i> Calendar View
+            </a>
+        </div>
+    </div>
+
+    <section class="ro-card">
+        <div class="ro-card-header">
+            <div>
+                <h2 class="ro-card-title">Regional Order Records</h2>
+                <p class="ro-card-subtitle">Search and open your assigned regional order documents.</p>
+            </div>
+        </div>
+        <div class="ro-card-body">
+            <div class="table-responsive">
+                <table id="table_regional_orders" class="table table-bordered table-hover ro-admin-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        $(function () {
+            var table_regional_orders = $('#table_regional_orders').DataTable({
+                processing: true,
+                serverSide: true,
+                autoWidth: false,
+                lengthChange: false,
+                searching: true,
+                info: true,
+                pageLength: 5,
+                ajax: {
+                    "url": "/RegionalOrder/GetMyRegionalOrders",
+                    "type": "POST"
+                },
+                columns: [
+                    {
+                        data: "RegionalOrderNumber", title: 'Regional Order No.',
+                        render: function (data, type, row, meta) {
+                            var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
+                            return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong></a>`;
+                        }
+                    },
+                    {
+                        title: 'Title/ Date Issued',
+                        render: function (data, type, row, meta) {
+                            return row.Title + '<br><b>' + row.RegionalOrderDate + '</b>'
+                        }
+                    },
+                    {
+                        title: 'Destination',
+                        render: function (data, type, row, meta) {
+                            return row.Venue
+                        }
+                    },
+                    {
+                        title: 'Participants',
+                        render: function (data, type, row, meta) {
+                            return `<a href="#" onclick="getData('` + row.DILGPersonnel + `','` + row.RegionalOrderNumber + `');" data-toggle="modal" data-target="#modal_list_personnel"><i class="fas fa-users"></i></a>`
+                        }
+                    },
+                ],
+            });
+        });
+    </script>
+}

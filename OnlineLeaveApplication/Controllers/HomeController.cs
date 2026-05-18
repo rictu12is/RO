@@ -33,6 +33,8 @@ namespace OnlineLeaveApplication.Controllers
                     Session["EmployeeID"] = employeeID;
                     Session["EmployeeName"] = string.Join(" ", new[] { obj.FirstName, obj.LastName }
                         .Where(name => !string.IsNullOrWhiteSpace(name)));
+                    Session["RoleID"] = obj.PositionID;
+                    Session["RoleName"] = obj.Position == null ? string.Empty : obj.Position.PositionName;
                     //var result = db.MainOffices
                     //    .Where(m => m.MainOfficeID == obj.Office.MainOfficeID)
                     //    .Select(m => new
@@ -126,7 +128,7 @@ namespace OnlineLeaveApplication.Controllers
         }
         public ActionResult ManageRegionalOrder()
         {
-            if (Session["Status"] == null || Convert.ToInt32(Session["Status"]) == 0)
+            if (!CurrentUserCanManageRegionalOrders())
             {
                 return RedirectToAction("RegionalOrders", "Home");
             }
@@ -187,6 +189,11 @@ namespace OnlineLeaveApplication.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        bool CurrentUserCanManageRegionalOrders()
+        {
+            return Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4;
         }
     }
 }

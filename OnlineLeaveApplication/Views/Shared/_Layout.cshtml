@@ -48,6 +48,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="@Url.Action("RegionalOrders", "Home")" class="nav-link">Regional Orders</a>
                 </li>
+                @{ if (Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4)
+                                {
+                    <li class="nav-item d-none d-sm-inline-block">
+                        <a href="@Url.Action("RegionalOrders", "Home")" class="nav-link">Admin Dashboard</a>
+                    </li>
+ }
+                }
                 <li class="nav-item d-none d-sm-inline-block">
                     <a href="@Url.Action("RegionalOrderCalendar", "Home")" class="nav-link">Calendar</a>
                 </li>
@@ -64,15 +71,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     </div>
                 </div>
             </form>
-
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a href="@Url.Action("Logout", "Home")" class="nav-link" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="d-none d-sm-inline">Logout</span>
-                    </a>
-                </li>
-            </ul>
 
             <!-- Right navbar links -->
             <!--<ul class="navbar-nav ml-auto">-->
@@ -179,7 +177,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
 
             <!-- Sidebar -->
-            <div class="sidebar">
+            <div class="sidebar ro-sidebar-layout">
                 @{
                     var employeeName = Convert.ToString(Session["EmployeeName"]);
                     if (string.IsNullOrWhiteSpace(employeeName))
@@ -198,7 +196,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </div>
 
                 <!-- Sidebar Menu -->
-                <nav class="mt-2">
+                <nav class="mt-2 ro-sidebar-nav">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                         with font-awesome or any other icon font library -->
@@ -251,7 +249,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
-                                @{ if (Convert.ToInt32(Session["Status"]) != 0)
+                                @{ if (Session["RoleID"] != null && Convert.ToInt32(Session["RoleID"]) == 4)
                                                 {
                                     <li class="nav-item">
                                         <a href="~/Home/ManageRegionalOrder" class="nav-link"> 
@@ -281,6 +279,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                 </nav>
                 <!-- /.sidebar-menu -->
+                <div class="ro-sidebar-logout">
+                    <a href="@Url.Action("Logout", "Home")" class="nav-link" title="Logout">
+                        <i class="nav-icon fas fa-sign-out-alt"></i>
+                        <p>Logout</p>
+                    </a>
+                </div>
             </div>
             <!-- /.sidebar -->
         </aside>
