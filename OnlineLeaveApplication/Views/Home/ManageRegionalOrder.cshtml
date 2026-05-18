@@ -4,16 +4,43 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<table id="table_regional_orders" class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<div class="ro-page-header">
+    <div>
+        <h1 class="ro-page-title">Manage Regional Orders</h1>
+        <p class="ro-page-subtitle">Create, attach, and review regional order records for DILG personnel.</p>
+    </div>
+    <div class="ro-page-actions">
+        <a class="btn ro-btn btn-outline-secondary" href="@Url.Action("RegionalOrders", "Home")">
+            <i class="fas fa-list"></i> My Orders
+        </a>
+        <a class="btn ro-btn ro-btn-primary" href="@Url.Action("RegionalOrderCalendar", "Home")">
+            <i class="fas fa-calendar-alt"></i> Calendar View
+        </a>
+    </div>
+</div>
+
+<section class="ro-card">
+    <div class="ro-card-header">
+        <div>
+            <h2 class="ro-card-title">Regional Order Management</h2>
+            <p class="ro-card-subtitle">Search records or create a new regional order with an attached PDF.</p>
+        </div>
+    </div>
+    <div class="ro-card-body">
+        <div class="table-responsive">
+            <table id="table_regional_orders" class="table table-bordered table-hover ro-admin-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
 <script>
     $(function () {
@@ -62,7 +89,7 @@
                         //`<a href="/Home/DisplayFile?id=" title="${res[2]}" target="_blank"><i class="fas fa-file-pdf"></i></a>`
                         // fas fa-print
                         var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
-                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong><a/>` ; // Example: Make text bold
+                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong></a>` ; // Example: Make text bold
                     }
                 },
                 {
@@ -82,7 +109,7 @@
             buttons: [
                 {
                     text: "<i class='fas fa-user-tie'></i> New Regional Order",
-                    className: "btn btn-dark",
+                    className: "btn ro-btn ro-btn-primary",
                     attr: {
                         "data-toggle": "modal",
                         "data-target": "#modal_new_ro",
@@ -108,7 +135,7 @@
             buttons: [
                 {
                     text: '<i class="fas fa-user-plus"></i> Add Personnel',
-                    className: 'btn btn-dark',
+                    className: 'btn ro-btn ro-btn-primary',
                     attr: {
                         "data-toggle": "modal",
                         "data-target": "#modal_personnel",

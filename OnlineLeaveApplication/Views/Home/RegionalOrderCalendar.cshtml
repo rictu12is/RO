@@ -3,57 +3,73 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
-    <div class="col-lg-8">
-        <div class="card card-primary">
-            <div class="card-header">
-                <h3 class="card-title">My Regional Orders Calendar</h3>
-            </div>
-            <div class="card-body p-0">
-                <div id="regional-order-calendar" class="p-3"></div>
-            </div>
-        </div>
+<div class="ro-page-header">
+    <div>
+        <h1 class="ro-page-title">Regional Order Calendar</h1>
+        <p class="ro-page-subtitle">Review activity dates, scheduled orders, and participant assignments.</p>
     </div>
-    <div class="col-lg-4">
-        <div class="card card-primary">
-            <div class="card-header">
-                <h3 class="card-title">Upcoming Regional Orders</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+    <div class="ro-page-actions">
+        <a class="btn ro-btn btn-outline-secondary" href="@Url.Action("RegionalOrders", "Home")">
+            <i class="fas fa-list"></i> My Orders
+        </a>
+        @{ if (Session["Status"] != null && Convert.ToInt32(Session["Status"]) != 0)
+            {
+                <a class="btn ro-btn ro-btn-primary" href="@Url.Action("ManageRegionalOrder", "Home")">
+                    <i class="fas fa-plus"></i> New Regional Order
+                </a>
+            }
+        }
+    </div>
+</div>
+
+<div class="row ro-calendar-grid">
+    <div class="col-lg-9">
+        <section class="ro-card">
+            <div class="ro-card-header">
+                <div>
+                    <h2 class="ro-card-title">Regional Order Schedule</h2>
+                    <p class="ro-card-subtitle">Calendar events are grouped by activity date ranges.</p>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush" id="upcoming-regional-orders"></div>
+            <div class="ro-card-body ro-card-body-flush">
+                <div id="regional-order-calendar"></div>
             </div>
-        </div>
-        <div class="card card-warning">
-            <div class="card-header">
-                <h3 class="card-title">Today's Regional Orders</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+        </section>
+    </div>
+    <div class="col-lg-3">
+        <section class="ro-card">
+            <div class="ro-card-header">
+                <div>
+                    <h2 class="ro-card-title"><i class="fas fa-calendar-plus text-primary"></i> Upcoming</h2>
+                    <p class="ro-card-subtitle">Future regional order activities.</p>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush" id="today-regional-orders"></div>
+            <div class="ro-card-body ro-card-body-flush">
+                <div class="list-group list-group-flush ro-status-list" id="upcoming-regional-orders"></div>
             </div>
-        </div>
-        <div class="card card-success">
-            <div class="card-header">
-                <h3 class="card-title">Past Regional Orders</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
+        </section>
+        <section class="ro-card">
+            <div class="ro-card-header">
+                <div>
+                    <h2 class="ro-card-title"><i class="fas fa-calendar-day text-warning"></i> Today</h2>
+                    <p class="ro-card-subtitle">Regional orders active today.</p>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush" id="past-regional-orders"></div>
+            <div class="ro-card-body ro-card-body-flush">
+                <div class="list-group list-group-flush ro-status-list is-today" id="today-regional-orders"></div>
             </div>
-        </div>
+        </section>
+        <section class="ro-card">
+            <div class="ro-card-header">
+                <div>
+                    <h2 class="ro-card-title"><i class="fas fa-history text-success"></i> Past</h2>
+                    <p class="ro-card-subtitle">Completed or elapsed activity dates.</p>
+                </div>
+            </div>
+            <div class="ro-card-body ro-card-body-flush">
+                <div class="list-group list-group-flush ro-status-list is-past" id="past-regional-orders"></div>
+            </div>
+        </section>
     </div>
 </div>
 

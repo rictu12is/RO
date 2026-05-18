@@ -1,24 +1,416 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+:root {
+    --ro-bg: #f4f6f9;
+    --ro-surface: #ffffff;
+    --ro-surface-muted: #eef2f7;
+    --ro-border: #d7dde7;
+    --ro-border-strong: #c3cad8;
+    --ro-text: #1f2630;
+    --ro-muted: #5d6675;
+    --ro-sidebar: #2b3137;
+    --ro-sidebar-soft: #343b43;
+    --ro-primary: #006fe6;
+    --ro-primary-dark: #0059bb;
+    --ro-warning: #c64f00;
+    --ro-success: #1f8f4d;
 }
 
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+body {
+    background: var(--ro-bg);
+    color: var(--ro-text);
+    font-size: 14px;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+a {
+    color: var(--ro-primary-dark);
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+.content-wrapper {
+    background: var(--ro-bg);
+}
+
+.content {
+    padding-bottom: 24px;
+}
+
+.content .container-fluid {
+    max-width: 100%;
+}
+
+.main-header {
+    border-bottom: 1px solid var(--ro-border);
+    box-shadow: none;
+}
+
+.main-header .navbar-nav .nav-link {
+    color: var(--ro-muted);
+    font-weight: 600;
+}
+
+.form-control-navbar {
+    border: 1px solid var(--ro-border-strong);
+    background: var(--ro-surface-muted);
+    min-width: 260px;
+}
+
+.form-control-navbar:focus {
+    border-color: var(--ro-primary);
+    box-shadow: 0 0 0 2px rgba(0, 111, 230, 0.12);
+}
+
+.main-sidebar {
+    background: var(--ro-sidebar);
+}
+
+.brand-link {
+    border-bottom: 0;
+    padding: 18px 16px;
+}
+
+.brand-link .brand-text {
+    color: #ffffff;
+    font-weight: 700 !important;
+    letter-spacing: 0;
+}
+
+.sidebar {
+    padding: 0 8px 12px;
+}
+
+.user-panel {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.user-panel .image img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    background: #ffffff;
+}
+
+.user-panel .info a {
+    color: #f4f7fb;
+    font-weight: 700;
+}
+
+.nav-sidebar > .nav-item {
+    margin-bottom: 4px;
+}
+
+.nav-sidebar .nav-link {
+    border-radius: 4px;
+    color: #d9e1ea;
+    font-weight: 600;
+}
+
+.nav-sidebar .nav-link > .nav-icon {
+    width: 22px;
+    margin-right: 8px;
+    text-align: center;
+}
+
+.nav-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active:focus,
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active:hover {
+    background: var(--ro-primary);
+    color: #ffffff;
+}
+
+.nav-treeview {
+    padding: 4px 0 4px 10px;
+}
+
+.nav-treeview > .nav-item > .nav-link {
+    padding-left: 14px;
+}
+
+.content-header {
+    display: none;
+}
+
+.main-footer {
+    border-top: 1px solid var(--ro-border);
+    color: var(--ro-muted);
+    background: var(--ro-surface);
+    font-size: 13px;
+}
+
+.ro-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ro-page-title {
+    margin: 0;
+    color: var(--ro-text);
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.ro-page-subtitle {
+    margin: 4px 0 0;
+    color: var(--ro-muted);
+    font-size: 0.98rem;
+}
+
+.ro-page-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ro-card {
+    background: var(--ro-surface);
+    border: 1px solid var(--ro-border);
+    border-radius: 4px;
+    box-shadow: none;
+    margin-bottom: 16px;
+}
+
+.ro-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--ro-border);
+    background: var(--ro-surface);
+}
+
+.ro-card-title {
+    margin: 0;
+    color: var(--ro-text);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.ro-card-subtitle {
+    margin: 2px 0 0;
+    color: var(--ro-muted);
+    font-size: 0.82rem;
+}
+
+.ro-card-body {
+    padding: 16px;
+}
+
+.ro-card-body-flush {
+    padding: 0;
+}
+
+.ro-admin-table {
+    width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+.ro-admin-table.table-bordered,
+.ro-admin-table.table-bordered th,
+.ro-admin-table.table-bordered td {
+    border-color: var(--ro-border);
+}
+
+.ro-admin-table thead th {
+    background: var(--ro-surface-muted);
+    color: var(--ro-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-bottom: 1px solid var(--ro-border-strong) !important;
+}
+
+.ro-admin-table tbody td {
+    vertical-align: middle;
+}
+
+.ro-admin-table.table-hover tbody tr:hover {
+    background: #f7faff;
+}
+
+.dataTables_wrapper {
+    color: var(--ro-text);
+}
+
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_info {
+    color: var(--ro-muted);
+    font-size: 0.86rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    margin-left: 8px;
+    border: 1px solid var(--ro-border-strong);
+    border-radius: 4px;
+    padding: 5px 9px;
+}
+
+.dt-buttons .btn,
+.ro-btn {
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+.btn-primary,
+.ro-btn-primary {
+    border-color: var(--ro-primary);
+    background: var(--ro-primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover,
+.ro-btn-primary:hover {
+    border-color: var(--ro-primary-dark);
+    background: var(--ro-primary-dark);
+    color: #ffffff;
+}
+
+.btn-dark {
+    border-color: var(--ro-primary);
+    background: var(--ro-primary);
+}
+
+.btn-dark:hover {
+    border-color: var(--ro-primary-dark);
+    background: var(--ro-primary-dark);
+}
+
+.modal-content,
+.card {
+    border-radius: 4px;
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--ro-border);
+}
+
+.form-control,
+.select2-container--bootstrap4 .select2-selection {
+    border-color: var(--ro-border-strong);
+    border-radius: 4px;
+}
+
+.form-control:focus {
+    border-color: var(--ro-primary);
+    box-shadow: 0 0 0 2px rgba(0, 111, 230, 0.12);
+}
+
+.ro-calendar-grid {
+    align-items: flex-start;
+}
+
+#regional-order-calendar {
+    min-height: 650px;
+}
+
+.fc-unthemed td,
+.fc-unthemed th,
+.fc-unthemed thead,
+.fc-unthemed tbody,
+.fc-unthemed .fc-divider,
+.fc-unthemed .fc-row,
+.fc-unthemed .fc-content,
+.fc-unthemed .fc-popover,
+.fc-unthemed .fc-list-view,
+.fc-unthemed .fc-list-heading td {
+    border-color: var(--ro-border);
+}
+
+.fc-toolbar.fc-header-toolbar {
+    margin: 0;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--ro-border);
+}
+
+.fc-toolbar h2 {
+    color: var(--ro-text);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.fc-button {
+    border-radius: 4px !important;
+    border-color: var(--ro-border-strong) !important;
+    background: var(--ro-surface) !important;
+    color: var(--ro-text) !important;
+    box-shadow: none !important;
+    text-transform: capitalize;
+}
+
+.fc-button-primary:not(:disabled).fc-button-active,
+.fc-button-primary:not(:disabled):active {
+    border-color: var(--ro-primary) !important;
+    background: var(--ro-primary) !important;
+    color: #ffffff !important;
+}
+
+.fc-day-header {
+    padding: 8px 0 !important;
+    background: var(--ro-surface-muted);
+    color: var(--ro-muted);
+    font-weight: 700;
+}
+
+.fc-day-number {
+    color: var(--ro-text);
+    font-weight: 600;
+}
+
+.fc-today {
+    background: #dfe9ff !important;
+}
+
+.fc-event {
+    border-radius: 3px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.ro-status-list .list-group-item {
+    border-color: var(--ro-border);
+    padding: 12px 14px;
+}
+
+.ro-status-list .list-group-item-action {
+    border-left: 4px solid var(--ro-primary);
+}
+
+.ro-status-list .list-group-item-action:hover {
+    background: #f7faff;
+}
+
+.ro-status-list.is-today .list-group-item-action {
+    border-left-color: var(--ro-warning);
+}
+
+.ro-status-list.is-past .list-group-item-action {
+    border-left-color: var(--ro-success);
+}
+
+@media (max-width: 767.98px) {
+    .ro-page-header {
+        display: block;
+    }
+
+    .ro-page-actions {
+        margin-top: 12px;
+    }
+
+    .form-control-navbar {
+        min-width: 0;
+        width: 180px;
+    }
+
+    .ro-card-body {
+        padding: 12px;
+    }
 }

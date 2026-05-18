@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.35229.62
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineLeaveApplication", "OnlineLeaveApplication\OnlineLeaveApplication.csproj", "{956B69C2-62CF-4182-952D-F34C960DD1DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RO", "OnlineLeaveApplication\RO.csproj", "{956B69C2-62CF-4182-952D-F34C960DD1DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,16 +4,40 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<table id="table_regional_orders" class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<div class="ro-page-header">
+    <div>
+        <h1 class="ro-page-title">My Regional Orders</h1>
+        <p class="ro-page-subtitle">Track issued regional orders, participants, venues, and attached PDF files.</p>
+    </div>
+    <div class="ro-page-actions">
+        <a class="btn ro-btn ro-btn-primary" href="@Url.Action("RegionalOrderCalendar", "Home")">
+            <i class="fas fa-calendar-alt"></i> Calendar View
+        </a>
+    </div>
+</div>
+
+<section class="ro-card">
+    <div class="ro-card-header">
+        <div>
+            <h2 class="ro-card-title">Regional Order Records</h2>
+            <p class="ro-card-subtitle">Search and open your assigned regional order documents.</p>
+        </div>
+    </div>
+    <div class="ro-card-body">
+        <div class="table-responsive">
+            <table id="table_regional_orders" class="table table-bordered table-hover ro-admin-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
 <script>
     $(function () {
@@ -36,7 +60,7 @@
                         //`<a href="/Home/DisplayFile?id=" title="${res[2]}" target="_blank"><i class="fas fa-file-pdf"></i></a>`
                         // fas fa-print
                         var url = "/RegionalOrder/DisplayFile?id=" + row.RegionalOrderID;
-                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong><a/>`; // Example: Make text bold
+                        return `<a href="${url}" target="_blank"><i class="fas fa-file-pdf"></i> <strong>` + data + `</strong></a>`; // Example: Make text bold
                     }
                 },
                 {

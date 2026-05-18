@@ -31,6 +31,8 @@ namespace OnlineLeaveApplication.Controllers
                     int employeeID = obj.EmployeeID;
 
                     Session["EmployeeID"] = employeeID;
+                    Session["EmployeeName"] = string.Join(" ", new[] { obj.FirstName, obj.LastName }
+                        .Where(name => !string.IsNullOrWhiteSpace(name)));
                     //var result = db.MainOffices
                     //    .Where(m => m.MainOfficeID == obj.Office.MainOfficeID)
                     //    .Select(m => new
@@ -50,7 +52,7 @@ namespace OnlineLeaveApplication.Controllers
                                 .FirstOrDefault();
                     Session["Status"] = result.ForInitialReview ? 2 : result.ForReview ? 3 : result.ForApproval ? 4 : 0;
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("RegionalOrders", "Home");
                 }
             }
              

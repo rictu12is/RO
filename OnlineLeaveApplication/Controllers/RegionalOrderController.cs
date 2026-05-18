@@ -346,16 +346,19 @@ namespace OnlineLeaveApplication.Controllers
                         .Select(a => a.Venue)
                         .Distinct()
                         .ToList()),
-                    RegionalOrderNumber= item.RegionalOrderNumber.ToString(),
-                    item.Title,
-                    RegionalOrderDate= item.RegionalOrderDate.Value.ToShortDateString(),
+                    RegionalOrderNumber = item.RegionalOrderNumber ?? string.Empty,
+                    Title = item.Title ?? string.Empty,
+                    RegionalOrderDate = item.RegionalOrderDate.HasValue
+                        ? item.RegionalOrderDate.Value.ToShortDateString()
+                        : string.Empty,
                     Remarks = string.Join(", ", item.RegionalOrderDetails
                         .Where(a => !string.IsNullOrEmpty(a.Remarks))
                         .Select(a => a.Remarks)
                         .Distinct()
                         .ToList()),
                     item.RegionalOrderID,
-                    DILGPersonnel = string.Join("|", item.RegionalOrderDetails.AsQueryable()
+                    DILGPersonnel = string.Join("|", item.RegionalOrderDetails
+                        .Where(a => a.Employee != null)
                         .Select(a => a.Employee.LastName + ", " + a.Employee.FirstName + " " + a.Employee.MiddleName)
                         .Distinct()
                         .ToList())
