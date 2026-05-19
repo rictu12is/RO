@@ -581,7 +581,7 @@ body.layout-top-nav .main-header {
 }
 
 .ro-status-list.is-past .list-group-item-action {
-    border-left-color: var(--ro-success);
+    border-left-color: #6c757d;
 }
 
 .ro-participant-list .list-group-item {
@@ -590,7 +590,11 @@ body.layout-top-nav .main-header {
 }
 
 .ro-participant-item {
-    border-left: 4px solid #17a2b8;
+    border-left: 4px solid #f94449;
+}
+
+.ro-active-participants-icon {
+    color: #f94449;
 }
 
 .ro-participant-title {
@@ -737,8 +741,24 @@ body.layout-top-nav .main-header {
 }
 
 .ro-date-display {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ro-date-issued {
     color: var(--ro-muted);
+    font-size: 0.72rem;
     font-weight: 700;
+    line-height: 1.2;
+}
+
+.ro-date-range {
+    color: var(--ro-text);
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.25;
 }
 
 .ro-status-badge {
@@ -862,14 +882,14 @@ body.layout-top-nav .main-header {
 }
 
 .ro-stat-card.is-info {
-    background: #117a8b;
-    border-color: #0f6674;
+    background: #f94449;
+    border-color: #f94449;
 }
 
 .ro-stat-card.is-warning {
     color: var(--ro-yellow-text);
     background: var(--ro-yellow);
-    border-color: var(--ro-yellow-dark);
+    border-color: var(--ro-yellow);
 }
 
 .ro-stat-card.is-warning p,

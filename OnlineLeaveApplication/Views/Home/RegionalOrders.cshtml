@@ -230,7 +230,7 @@
                 lengthChange: false,
                 searching: false,
                 info: true,
-                pageLength: 5,
+                pageLength: 10,
                 ajax: {
                     url: '/RegionalOrder/GetRegionalOrderDashboard',
                     type: 'POST',
@@ -274,8 +274,11 @@
                     {
                         data: 'DateDisplay',
                         title: 'Regional Order Date / Range',
-                        render: function (data) {
-                            return '<span class="ro-date-display">' + htmlEncode(textOrEmpty(data, 'No date')) + '</span>';
+                        render: function (data, type, row) {
+                            return '<div class="ro-date-display">' +
+                                '<div class="ro-date-issued">Issued: ' + htmlEncode(textOrEmpty(row.RegionalOrderDate, 'No RO date')) + '</div>' +
+                                '<div class="ro-date-range">' + htmlEncode(textOrEmpty(row.ActivityDateRange, textOrEmpty(data, 'No activity range'))) + '</div>' +
+                                '</div>';
                         }
                     },
                     {

@@ -340,7 +340,7 @@ namespace OnlineLeaveApplication.Controllers
                                 ? "upcoming"
                                 : "today";
                         var statusColor = statusCategory == "past"
-                            ? "#28a745"
+                            ? "#d3d3d3"
                             : statusCategory == "today"
                                 ? "#ffc107"
                                 : "#007bff";
@@ -744,7 +744,7 @@ namespace OnlineLeaveApplication.Controllers
                 RegionalOrderNumber = regionalOrder.RegionalOrderNumber ?? string.Empty,
                 Title = regionalOrder.Title ?? string.Empty,
                 RegionalOrderDate = regionalOrderDate.HasValue
-                    ? regionalOrderDate.Value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                    ? FormatDashboardDate(regionalOrderDate.Value)
                     : string.Empty,
                 ActivityDateRange = activityRange,
                 DateDisplay = GetDashboardDateDisplay(regionalOrderDate, activityRange),
@@ -790,17 +790,21 @@ namespace OnlineLeaveApplication.Controllers
 
             if (firstDate == lastDate)
             {
-                return firstDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                return FormatDashboardDate(firstDate);
             }
 
-            return firstDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) + " - " +
-                lastDate.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+            return FormatDashboardDate(firstDate) + " - " + FormatDashboardDate(lastDate);
+        }
+
+        string FormatDashboardDate(DateTime date)
+        {
+            return date.ToString("MMM. d, yyyy", CultureInfo.InvariantCulture);
         }
 
         string GetDashboardDateDisplay(DateTime? regionalOrderDate, string activityRange)
         {
             var regionalOrderDateLabel = regionalOrderDate.HasValue
-                ? regionalOrderDate.Value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)
+                ? FormatDashboardDate(regionalOrderDate.Value)
                 : "No RO date";
 
             if (string.IsNullOrWhiteSpace(activityRange))
